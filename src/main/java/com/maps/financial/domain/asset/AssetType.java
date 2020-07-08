@@ -1,4 +1,4 @@
-package com.maps.financial.domain.assets;
+package com.maps.financial.domain.asset;
 
 public enum AssetType {
 	
