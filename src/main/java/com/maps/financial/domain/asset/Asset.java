@@ -69,11 +69,13 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getQuantityBuy() {
-    	return this.getMovements()
+    	BigDecimal totalQuantity = this.getMovements()
     			.stream()
     			.filter(movement -> MovementType.BUY.equals(movement.getType()))
     			.map(movement -> movement.getQuantity())
-    			.reduce(BigDecimal.ZERO, BigDecimal::add);			   
+    			.reduce(BigDecimal.ZERO, BigDecimal::add);		
+    	
+    	return totalQuantity.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -82,11 +84,13 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getTotalValueBuy() {
-    	return this.getMovements()
+    	BigDecimal totalValue = this.getMovements()
     			.stream()
     			.filter(movement -> MovementType.BUY.equals(movement.getType()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
+    	
+    	return totalValue.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -95,11 +99,13 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getQuantitySell() {
-    	return this.getMovements()
+    	BigDecimal totalQuantity = this.getMovements()
     			.stream()
     			.filter(movement -> MovementType.SELL.equals(movement.getType()))
     			.map(movement -> movement.getQuantity())
-    			.reduce(BigDecimal.ZERO, BigDecimal::add);			   
+    			.reduce(BigDecimal.ZERO, BigDecimal::add);		
+    	
+    	return totalQuantity.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -108,11 +114,13 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getTotalValueSell() {
-    	return this.getMovements()
+    	BigDecimal totalValue = this.getMovements()
     			.stream()
     			.filter(movement -> MovementType.SELL.equals(movement.getType()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
+    	
+    	return totalValue.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -121,7 +129,8 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getAverageValueBuy() {
-    	return this.getTotalValueBuy().divide(this.getQuantityBuy());
+    	BigDecimal averageValueBuy = this.getTotalValueBuy().divide(this.getQuantityBuy(), BigDecimal.ROUND_DOWN);
+    	return averageValueBuy.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -138,8 +147,9 @@ public class Asset {
      * 
      * @return BigDecimal
      */
-    public BigDecimal getTotalMarketPlace() {
-    	return this.getTotalQuantity().multiply(this.getMarketPrice());
+    public BigDecimal getTotalMarketPrice() {
+    	BigDecimal totalMarketPrice = this.getTotalQuantity().multiply(this.getMarketPrice());
+    	return totalMarketPrice.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -148,7 +158,8 @@ public class Asset {
      * @return BigDecimal
      */
     public BigDecimal getIncome() {
-    	return this.getMarketPrice().divide(this.getAverageValueBuy());
+    	BigDecimal income = this.getMarketPrice().divide(this.getAverageValueBuy(), BigDecimal.ROUND_DOWN);
+    	return income.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -157,7 +168,8 @@ public class Asset {
      * @return BigDecimal
      */
     public BigDecimal getProfit() {
-    	return this.getTotalValueSell().subtract(this.getTotalValueBuy()); 
+    	BigDecimal profit = this.getTotalValueSell().subtract(this.getTotalValueBuy()); 
+    	return profit.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**

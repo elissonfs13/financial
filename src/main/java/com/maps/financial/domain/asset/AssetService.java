@@ -1,5 +1,6 @@
 package com.maps.financial.domain.asset;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,26 @@ public class AssetService {
 		Asset asset = findById(assetId);
 		asset.includeMovement(newMovement);
 		return asset;
+	}
+	
+	public BigDecimal getTotalQuantity(final Long assetId) {
+		Asset asset = findById(assetId);
+		return asset.getTotalQuantity();
+	}
+	
+	public BigDecimal getTotalMarketPrice(final Long assetId) {
+		Asset asset = findById(assetId);
+		return asset.getTotalMarketPrice();
+	}
+	
+	public BigDecimal getIncome(final Long assetId) {
+		Asset asset = findById(assetId);
+		return asset.getIncome();
+	}
+	
+	public BigDecimal getProfit(final Long assetId) {
+		Asset asset = findById(assetId);
+		return asset.getProfit();
 	}
 
 }

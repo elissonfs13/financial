@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import com.maps.financial.exceptions.AccountBalanceNotAvailable;
@@ -39,7 +38,6 @@ public class Account {
 	private BigDecimal balance;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
-	@OrderBy("id")
 	private final List<Launch> launches = new ArrayList<>();
 	
 	/**
@@ -49,7 +47,7 @@ public class Account {
 	 * @param newValue
 	 */
 	private void updateBalanceOutbound(BigDecimal newValue) {
-		if (this.verifyAvailableBalance(newValue)) {
+		if (this.isUnavailableBalance(newValue)) {
 			throw new AccountBalanceNotAvailable(ExceptionMessage.MESSAGE_ACCOUNT_BALANACE_NOT_AVAILABLE);
 		}
 		this.balance.subtract(newValue);
@@ -71,8 +69,8 @@ public class Account {
 	 * @param newValue
 	 * @return boolean
 	 */
-	private boolean verifyAvailableBalance(BigDecimal newValue) {
-		return newValue.compareTo(this.getBalance()) == 1 ? false : true;
+	private boolean isUnavailableBalance(BigDecimal newValue) {
+		return this.getBalance().compareTo(newValue) == -1 ? true : false;
 	}
 	
 	/**

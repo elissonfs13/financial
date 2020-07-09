@@ -23,7 +23,9 @@ public class AccountService {
 	
 	public Account includeLaunch(final Long id, final Launch newLaunch) {
 		Account account = findById(id);
-		account.includeLaunch(newLaunch);
+		if (newLaunch != null) {
+			account.includeLaunch(newLaunch);
+		}
 		return account;
 	}
 
