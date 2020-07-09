@@ -1,12 +1,10 @@
-package com.maps.financial.domain.account;
+package com.maps.financial.domain.asset;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,31 +20,34 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 
+ * Classe para Valor de Mercado
+ * 
+ * @author Elisson
+ *
+ */
 @Entity
-@Table(name = "launch")
+@Table(name = "market_price")
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
-public class Launch {
+public class MarketPrice {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 	@EqualsAndHashCode.Include
     private Long id;
 	
-	@Enumerated(EnumType.STRING)
-	private LaunchType type;
+	@JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(optional = false)
+    private Asset asset;
 	
-	private String description;
-	
-	private BigDecimal value;
-	
-	@JoinColumn(name = "account_id", referencedColumnName = "id")
-	@ManyToOne
-	private Account account;
+	@Basic(optional = false)
+	private BigDecimal price;
 	
 	@Basic(optional = false)
 	@Temporal(TemporalType.DATE)
-	private LocalDate date; //data do movimento
-
+	private LocalDate date;
+	
 }

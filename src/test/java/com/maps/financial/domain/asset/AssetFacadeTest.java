@@ -3,8 +3,6 @@ package com.maps.financial.domain.asset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.math.BigDecimal;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +74,6 @@ public class AssetFacadeTest {
 	private Asset createAsset() {
 		return Asset.builder()
 				.id(ASSET_ID)
-				.marketPrice(new BigDecimal(2.25))
 				.type(AssetType.RF)
 				.build();
 	}

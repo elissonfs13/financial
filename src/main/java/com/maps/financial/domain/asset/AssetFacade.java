@@ -1,5 +1,7 @@
 package com.maps.financial.domain.asset;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maps.financial.domain.account.AccountFacade;
+import com.maps.financial.exceptions.ExceptionMessage;
+import com.maps.financial.exceptions.IssueDateNotBeforeDueDate;
 
 @Component
 public class AssetFacade {
@@ -27,6 +31,11 @@ public class AssetFacade {
 	
 	@Transactional
 	public Asset create(final Asset asset) {
+		//Validação: data de emissão deve ser sempre anterior a data de vencimento
+		if (!asset.getIssueDate().isBefore(asset.getDueDate())) {
+			throw new IssueDateNotBeforeDueDate(ExceptionMessage.MESSAGE_ISSUE_NOT_BEFORE_DUE);
+		}
+		
 		return service.create(asset);
 	}
 	
@@ -44,6 +53,32 @@ public class AssetFacade {
 	public Asset includeMovement(final Long accountId, final Long assetId, final AssetMovement newMovement) {
 		accountFacade.includeLaunch(accountId, newMovement);
 		return service.includeMovement(assetId, newMovement);
+	}
+	
+	public BigDecimal getTotalQuantity(final Long assetId, LocalDate atualDate) {
+		return service.getTotalQuantity(assetId, atualDate);
+	}
+	
+	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate atualDate) {
+		return service.getTotalMarketPrice(assetId, atualDate);
+	}
+	
+	public BigDecimal getIncome(final Long assetId, LocalDate atualDate) {
+		return service.getIncome(assetId, atualDate);
+	}
+	
+	public BigDecimal getProfit(final Long assetId, LocalDate atualDate) {
+		return service.getProfit(assetId, atualDate);
+	}
+	
+	@Transactional
+	public Asset includeMarketPrice(final Long assetId, final BigDecimal price, final LocalDate date) {
+		return service.includeMarketPrice(assetId, price, date);
+	}
+	
+	@Transactional
+	public Asset excludeMarketPrice(final Long assetId, final LocalDate date) {
+		return service.excludeMarketPrice(assetId, date);
 	}
 
 }

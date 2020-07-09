@@ -83,13 +83,11 @@ public class AssetServiceTest {
 		final Asset assetUpdate = Asset.builder()
 				.id(100L)
 				.name(NAME_UPDATED)
-				.marketPrice(new BigDecimal(2))
 				.build();
 		
 		final Asset assetReturned = service.update(ASSET_ID, assetUpdate);	
 		assertNotNull(assetReturned);		
 		assertEquals(assetUpdate.getName(), assetReturned.getName());
-		assertEquals(assetUpdate.getMarketPrice(), assetReturned.getMarketPrice());	
 		assertNotEquals(assetUpdate.getId(), assetReturned.getId());
 	}
 	
@@ -137,7 +135,7 @@ public class AssetServiceTest {
 		addMovements();
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
-		BigDecimal valueReturned = service.getTotalQuantity(ASSET_ID);
+		BigDecimal valueReturned = service.getTotalQuantity(ASSET_ID, null);
 		assertNotNull(valueReturned);
 		assertEquals(formatBigDecimalScale(4.81), valueReturned);	
 	}
@@ -147,7 +145,7 @@ public class AssetServiceTest {
 		addMovements();
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
-		BigDecimal valueReturned = service.getTotalMarketPrice(ASSET_ID);
+		BigDecimal valueReturned = service.getTotalMarketPrice(ASSET_ID, null);
 		assertNotNull(valueReturned);
 		assertEquals(formatBigDecimalScale(10.82), valueReturned);	
 	}
@@ -157,7 +155,7 @@ public class AssetServiceTest {
 		addMovements();
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
-		BigDecimal valueReturned = service.getIncome(ASSET_ID);
+		BigDecimal valueReturned = service.getIncome(ASSET_ID, null);
 		assertNotNull(valueReturned);
 		assertEquals(formatBigDecimalScale(2.34), valueReturned);	
 	}
@@ -167,7 +165,7 @@ public class AssetServiceTest {
 		addMovements();
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
-		BigDecimal valueReturned = service.getProfit(ASSET_ID);
+		BigDecimal valueReturned = service.getProfit(ASSET_ID, null);
 		assertNotNull(valueReturned);
 		assertEquals(formatBigDecimalScale(4.90), valueReturned);	
 	}
@@ -187,7 +185,6 @@ public class AssetServiceTest {
 	private Asset createAsset() {
 		return Asset.builder()
 				.id(ASSET_ID)
-				.marketPrice(new BigDecimal(2.25))
 				.type(AssetType.RF)
 				.name(NAME_ORIGINAL)
 				.build();

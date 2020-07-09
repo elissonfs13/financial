@@ -1,6 +1,7 @@
 package com.maps.financial.domain.asset;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ public class AssetService {
 	public Asset update(final Long assetId, final Asset assetUpdate) {
 		Asset asset = findById(assetId);
 		asset.setName(assetUpdate.getName());
-		asset.setMarketPrice(assetUpdate.getMarketPrice());
 		asset.setType(assetUpdate.getType());
 		return asset;
 	}
@@ -45,24 +45,36 @@ public class AssetService {
 		return asset;
 	}
 	
-	public BigDecimal getTotalQuantity(final Long assetId) {
+	public BigDecimal getTotalQuantity(final Long assetId, LocalDate atualDate) {
 		Asset asset = findById(assetId);
-		return asset.getTotalQuantity();
+		return asset.getTotalQuantity(atualDate);
 	}
 	
-	public BigDecimal getTotalMarketPrice(final Long assetId) {
+	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate atualDate) {
 		Asset asset = findById(assetId);
-		return asset.getTotalMarketPrice();
+		return asset.getTotalMarketPrice(atualDate);
 	}
 	
-	public BigDecimal getIncome(final Long assetId) {
+	public BigDecimal getIncome(final Long assetId, LocalDate atualDate) {
 		Asset asset = findById(assetId);
-		return asset.getIncome();
+		return asset.getIncome(atualDate);
 	}
 	
-	public BigDecimal getProfit(final Long assetId) {
+	public BigDecimal getProfit(final Long assetId, LocalDate atualDate) {
 		Asset asset = findById(assetId);
-		return asset.getProfit();
+		return asset.getProfit(atualDate);
+	}
+	
+	public Asset includeMarketPrice(final Long assetId, final BigDecimal price, final LocalDate date) {
+		Asset asset = findById(assetId);
+		asset.includeMarketPrice(price, date);
+		return asset;
+	}
+	
+	public Asset excludeMarketPrice(final Long assetId, final LocalDate date) {
+		Asset asset = findById(assetId);
+		asset.excludeMarketPrice(date);
+		return asset;
 	}
 
 }

@@ -1,7 +1,9 @@
 package com.maps.financial.domain.asset;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -11,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,5 +44,9 @@ public class AssetMovement {
 	private BigDecimal quantity;
 	
 	private BigDecimal value;
+	
+	@Basic(optional = false)
+	@Temporal(TemporalType.DATE)
+	private LocalDate date; //data do movimento
 
 }

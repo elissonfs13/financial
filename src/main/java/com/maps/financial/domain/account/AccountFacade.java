@@ -42,9 +42,9 @@ public class AccountFacade {
 	
 	private Launch getLaunchByMovementType(final AssetMovement assetMovement) {
 		if (MovementType.BUY.equals(assetMovement.getType())) {
-			return launchFactory.generateLaunch(DESCRIPTION_BUY, LaunchType.OUTBOUND, assetMovement.getValue());
+			return launchFactory.generateLaunch(DESCRIPTION_BUY, LaunchType.OUTBOUND, assetMovement.getValue(), assetMovement.getDate());
 		} else if (MovementType.SELL.equals(assetMovement.getType())) {
-			return launchFactory.generateLaunch(DESCRIPTION_SELL, LaunchType.INBOUND, assetMovement.getValue());
+			return launchFactory.generateLaunch(DESCRIPTION_SELL, LaunchType.INBOUND, assetMovement.getValue(), assetMovement.getDate());
 		} else {
 			return null;
 		}
