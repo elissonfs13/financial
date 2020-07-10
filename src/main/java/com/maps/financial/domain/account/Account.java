@@ -19,20 +19,17 @@ import com.maps.financial.exceptions.ExceptionMessage;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "account")
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
 public class Account {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	@EqualsAndHashCode.Include
     private Long id;
 	
 	@Column(precision=10, scale=2)
@@ -82,7 +79,7 @@ public class Account {
      */
     private BigDecimal getTotalValueOutbound(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getLaunches()
     			.stream()
@@ -101,7 +98,7 @@ public class Account {
      */
     private BigDecimal getTotalValueInbound(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getLaunches()
     			.stream()

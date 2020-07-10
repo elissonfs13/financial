@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maps.financial.domain.account.AccountFacade;
-import com.maps.financial.exceptions.ExceptionMessage;
-import com.maps.financial.exceptions.IssueDateNotBeforeDueDate;
 
 @Component
 public class AssetFacade {
@@ -31,11 +29,6 @@ public class AssetFacade {
 	
 	@Transactional
 	public Asset create(final Asset asset) {
-		//Validação: data de emissão deve ser sempre anterior a data de vencimento
-		if (!asset.getIssueDate().isBefore(asset.getDueDate())) {
-			throw new IssueDateNotBeforeDueDate(ExceptionMessage.MESSAGE_ISSUE_NOT_BEFORE_DUE);
-		}
-		
 		return service.create(asset);
 	}
 	
@@ -79,6 +72,10 @@ public class AssetFacade {
 	@Transactional
 	public Asset excludeMarketPrice(final Long assetId, final LocalDate date) {
 		return service.excludeMarketPrice(assetId, date);
+	}
+	
+	public List<AssetMovement> getMovements(Long assetId, LocalDate dateBegin, LocalDate dateEnd) {
+		return service.getMovements(assetId, dateBegin, dateEnd);
 	}
 
 }

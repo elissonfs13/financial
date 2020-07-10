@@ -52,6 +52,12 @@ public class AccountFacadeTest {
 	}
 	
 	@Test
+	public void getBalanceTest() {
+		facade.getBalance(ACCOUNT_ID, LocalDate.now());
+		verify(service, times(1)).getBalance(ACCOUNT_ID, LocalDate.now());
+	}
+	
+	@Test
 	public void includeLaunchWithLaunchTest() {
 		Launch launch = Launch.builder().build();
 		facade.includeLaunch(ACCOUNT_ID, launch);
@@ -59,11 +65,19 @@ public class AccountFacadeTest {
 	}
 	
 	@Test
+	public void getLaunchesTest() {
+		LocalDate dateBegin = LocalDate.now();
+		LocalDate dateEnd = LocalDate.now();
+		facade.getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
+		verify(service, times(1)).getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
+	}
+	
+	@Test
 	public void includeLaunchWithAssetMovementBuyTest() {
-		BigDecimal value = new BigDecimal(1.00);
+		BigDecimal value = new BigDecimal(1.00).setScale(2, BigDecimal.ROUND_DOWN);
 		Launch launch = Launch.builder().build();
 		LocalDate date = LocalDate.now();
-		AssetMovement movement = AssetMovement.builder().type(MovementType.BUY).value(value).build();
+		AssetMovement movement = AssetMovement.builder().type(MovementType.BUY).value(value).date(date).build();
 		when(launchFactory.generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class))).thenReturn(launch);
 		
@@ -77,10 +91,10 @@ public class AccountFacadeTest {
 	
 	@Test
 	public void includeLaunchWithAssetMovementSellTest() {
-		BigDecimal value = new BigDecimal(1.00);
+		BigDecimal value = new BigDecimal(1.00).setScale(2, BigDecimal.ROUND_DOWN);
 		Launch launch = Launch.builder().build();
 		LocalDate date = LocalDate.now();
-		AssetMovement movement = AssetMovement.builder().type(MovementType.SELL).value(value).build();
+		AssetMovement movement = AssetMovement.builder().type(MovementType.SELL).value(value).date(date).build();
 		when(launchFactory.generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class))).thenReturn(launch);
 		

@@ -1,6 +1,9 @@
 package com.maps.financial.domain.account;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,21 @@ public class AccountService {
 			account.includeLaunch(newLaunch);
 		}
 		return account;
+	}
+	
+	public BigDecimal getBalance(final Long accountId, LocalDate date) {
+		Account account = findById(accountId);
+		return account.getBalanceInDate(date);
+	}
+
+	public List<Launch> getLaunches(Long accountId, LocalDate dateBegin, LocalDate dateEnd) {
+		Account account = findById(accountId);
+		List<Launch> launches = account.getLaunches()
+				.stream()
+				.filter(launch -> !launch.getDate().isBefore(dateBegin) && !launch.getDate().isAfter(dateEnd)) 
+				.collect(Collectors.toList());
+		
+		return launches;
 	}
 
 }

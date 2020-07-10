@@ -1,5 +1,7 @@
 package com.maps.financial.domain.account;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,14 @@ public class AccountFacade {
 	public Account includeLaunch(final Long id, final AssetMovement assetMovement) {
 		Launch newLaunch = this.getLaunchByMovementType(assetMovement);
 		return accountService.includeLaunch(id, newLaunch);
+	}
+	
+	public BigDecimal getBalance(final Long accountId, LocalDate date) {
+		return accountService.getBalance(accountId, date);
+	}
+	
+	public List<Launch> getLaunches(final Long accountId, LocalDate dateBegin, LocalDate dateEnd) {
+		return accountService.getLaunches(accountId, dateBegin, dateEnd);
 	}
 	
 	private Launch getLaunchByMovementType(final AssetMovement assetMovement) {

@@ -3,6 +3,9 @@ package com.maps.financial.domain.asset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +67,57 @@ public class AssetFacadeTest {
 	}
 	
 	@Test
+	public void getTotalQuantityTest() {
+		LocalDate date = LocalDate.now();
+		facade.getTotalQuantity(ASSET_ID, date);
+		verify(service, times(1)).getTotalQuantity(ASSET_ID, date);
+	}
+	
+	@Test
+	public void getTotalMarketPriceTest() {
+		LocalDate date = LocalDate.now();
+		facade.getTotalMarketPrice(ASSET_ID, date);
+		verify(service, times(1)).getTotalMarketPrice(ASSET_ID, date);
+	}
+	
+	@Test
+	public void getIncomeTest() {
+		LocalDate date = LocalDate.now();
+		facade.getIncome(ASSET_ID, date);
+		verify(service, times(1)).getIncome(ASSET_ID, date);
+	}
+	
+	@Test
+	public void getProfitTest() {
+		LocalDate date = LocalDate.now();
+		facade.getProfit(ASSET_ID, date);
+		verify(service, times(1)).getProfit(ASSET_ID, date);
+	}
+	
+	@Test
+	public void includeMarketPriceTest() {
+		LocalDate date = LocalDate.now();
+		BigDecimal price = new BigDecimal(1);
+		facade.includeMarketPrice(ASSET_ID, price, date);
+		verify(service, times(1)).includeMarketPrice(ASSET_ID, price, date);
+	}
+	
+	@Test
+	public void excludeMarketPriceTest() {
+		LocalDate date = LocalDate.now();
+		facade.excludeMarketPrice(ASSET_ID, date);
+		verify(service, times(1)).excludeMarketPrice(ASSET_ID, date);
+	}
+	
+	@Test
+	public void getMovementsTest() {
+		LocalDate dateBegin = LocalDate.now();
+		LocalDate dateEnd = LocalDate.now();
+		facade.getMovements(ASSET_ID, dateBegin, dateEnd);
+		verify(service, times(1)).getMovements(ASSET_ID, dateBegin, dateEnd);
+	}
+	
+	@Test
 	public void includeMovementTest() {
 		AssetMovement movement = AssetMovement.builder().build();
 		facade.includeMovement(ACCOUNT_ID, ASSET_ID, movement);
@@ -75,6 +129,8 @@ public class AssetFacadeTest {
 		return Asset.builder()
 				.id(ASSET_ID)
 				.type(AssetType.RF)
+				.issueDate(LocalDate.now().minusDays(1L))
+				.dueDate(LocalDate.now().plusDays(1L))
 				.build();
 	}
 

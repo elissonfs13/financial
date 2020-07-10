@@ -16,7 +16,6 @@ import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,13 +29,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "market_price")
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
 public class MarketPrice {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	@EqualsAndHashCode.Include
     private Long id;
 	
 	@JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)

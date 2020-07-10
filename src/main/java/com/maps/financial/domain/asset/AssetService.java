@@ -3,10 +3,13 @@ package com.maps.financial.domain.asset;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.maps.financial.exceptions.ExceptionMessage;
+import com.maps.financial.exceptions.IssueDateNotBeforeDueDate;
 import com.maps.financial.exceptions.ObjectNotFoundException;
 
 @Service
@@ -24,6 +27,12 @@ public class AssetService {
 	}
 	
 	public Asset create(final Asset asset) {
+		//Validação: data de emissão deve ser sempre anterior a data de vencimento
+		if (asset.getIssueDate() == null || asset.getDueDate() == null || 
+				!asset.getIssueDate().isBefore(asset.getDueDate())) {
+			throw new IssueDateNotBeforeDueDate(ExceptionMessage.MESSAGE_ISSUE_NOT_BEFORE_DUE);
+		}
+				
 		return repository.save(asset);
 	}
 	
@@ -75,6 +84,16 @@ public class AssetService {
 		Asset asset = findById(assetId);
 		asset.excludeMarketPrice(date);
 		return asset;
+	}
+	
+	public List<AssetMovement> getMovements(Long assetId, LocalDate dateBegin, LocalDate dateEnd) {
+		Asset asset = findById(assetId);
+		List<AssetMovement> movements = asset.getMovements()
+				.stream()
+				.filter(movement -> !movement.getDate().isBefore(dateBegin) && !movement.getDate().isAfter(dateEnd)) 
+				.collect(Collectors.toList());
+		
+		return movements;
 	}
 
 }

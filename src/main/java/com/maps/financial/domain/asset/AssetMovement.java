@@ -18,20 +18,17 @@ import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "movement_asset")
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
 public class AssetMovement {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	@EqualsAndHashCode.Include
     private Long id;
 	
 	@JoinColumn(name = "asset_id", referencedColumnName = "id", nullable = false)
@@ -48,5 +45,9 @@ public class AssetMovement {
 	@Basic(optional = false)
 	@Temporal(TemporalType.DATE)
 	private LocalDate date; //data do movimento
+	
+	public BigDecimal getValue() {
+		return this.value.setScale(2, BigDecimal.ROUND_DOWN);
+	}
 
 }

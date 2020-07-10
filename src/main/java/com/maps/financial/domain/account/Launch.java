@@ -18,20 +18,17 @@ import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "launch")
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
 public class Launch {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	@EqualsAndHashCode.Include
     private Long id;
 	
 	@Enumerated(EnumType.STRING)
@@ -48,5 +45,9 @@ public class Launch {
 	@Basic(optional = false)
 	@Temporal(TemporalType.DATE)
 	private LocalDate date; //data do movimento
+	
+	public BigDecimal getValue() {
+		return this.value.setScale(2, BigDecimal.ROUND_DOWN);
+	}
 
 }

@@ -28,7 +28,6 @@ import com.maps.financial.exceptions.MovementNotAllowedInDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,13 +42,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "financial_asset")
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor @NoArgsConstructor @Builder
 public class Asset {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	@EqualsAndHashCode.Include
     private Long id;
  
 	@Setter
@@ -61,11 +58,13 @@ public class Asset {
     @Enumerated(EnumType.STRING)
     private AssetType type;
 	
+	@Setter
 	@Basic(optional = false)
 	@Column(name = "issue_date")
 	@Temporal(TemporalType.DATE)
 	private LocalDate issueDate; //data de emissão
 	
+	@Setter
 	@Basic(optional = false)
 	@Column(name = "due_date")
 	@Temporal(TemporalType.DATE)
@@ -102,7 +101,11 @@ public class Asset {
      * @return BigDecimal
      */
     public BigDecimal getIncome(LocalDate atualDate) {
-    	BigDecimal income = this.getMarketPrice().divide(this.getAverageValueBuy(atualDate), BigDecimal.ROUND_DOWN);
+    	BigDecimal averageValueBuy = this.getAverageValueBuy(atualDate);
+    	if (BigDecimal.ZERO.compareTo(averageValueBuy) == 0) {
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
+    	}
+    	BigDecimal income = this.getMarketPrice().divide(averageValueBuy, BigDecimal.ROUND_DOWN);
     	return income.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
@@ -167,11 +170,11 @@ public class Asset {
      */
     private BigDecimal getQuantityBuy(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalQuantity = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && atualDate.isAfter(movement.getDate()))
+    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
     			.map(movement -> movement.getQuantity())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);		
     	
@@ -186,11 +189,11 @@ public class Asset {
      */
     private BigDecimal getTotalValueBuy(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && atualDate.isAfter(movement.getDate()))
+    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -205,11 +208,11 @@ public class Asset {
      */
     private BigDecimal getQuantitySell(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalQuantity = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && atualDate.isAfter(movement.getDate()))
+    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
     			.map(movement -> movement.getQuantity())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);		
     	
@@ -223,11 +226,11 @@ public class Asset {
      */
     private BigDecimal getTotalValueSell(LocalDate atualDate) {
     	if (atualDate == null) {
-    		return BigDecimal.ZERO;
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && atualDate.isAfter(movement.getDate()))
+    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -240,7 +243,11 @@ public class Asset {
      * @return BigDecimal
      */
     private BigDecimal getAverageValueBuy(LocalDate atualDate) {
-    	BigDecimal averageValueBuy = this.getTotalValueBuy(atualDate).divide(this.getQuantityBuy(atualDate), BigDecimal.ROUND_DOWN);
+    	BigDecimal quantityBuy = this.getQuantityBuy(atualDate);
+    	if (BigDecimal.ZERO.compareTo(quantityBuy) == 0) {
+    		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
+    	}
+		BigDecimal averageValueBuy = this.getTotalValueBuy(atualDate).divide(quantityBuy, BigDecimal.ROUND_DOWN);
     	return averageValueBuy.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
@@ -253,7 +260,7 @@ public class Asset {
     private BigDecimal getMarketPrice() {
     	Comparator<MarketPrice> comparator = Comparator.comparing(MarketPrice::getDate);
     	MarketPrice marketPrice = this.marketPrices.stream().max(comparator).orElse(null);
-    	return marketPrice != null ? marketPrice.getPrice() : BigDecimal.ZERO;
+    	return marketPrice != null ? marketPrice.getPrice() : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
     /**
@@ -262,13 +269,13 @@ public class Asset {
      * @param newMovement
      */
     private void movementValidations(AssetMovement newMovement) {
-    	// Caso de movimentação de venda, ocorre a verificação para a garantia de quantidade disponível do ativo para venda
-    	if (MovementType.SELL.equals(newMovement.getType()) && newMovement.getQuantity()
-    			.compareTo(this.getTotalQuantity(newMovement.getDate())) == 1) {
+    	// Caso de movimentação de venda, ocorre a verificação para a garantia de quantidade disponível do ativo para venda na data atual
+    	if ((MovementType.SELL.equals(newMovement.getType()) && 
+    			newMovement.getQuantity().compareTo(this.getTotalQuantity(LocalDate.now())) == 1)) {
     		throw new AssetQuantityNotAvailable(ExceptionMessage.MESSAGE_ASSET_QUANTITY_NOT_AVAILABLE);
     	}
     	
-    	//Movimentação só pode ocorrer entre entre a data de emissão (inclusive) e a data de vencimento	(exclusive)
+    	//Movimentação só pode ocorrer entre a data de emissão (inclusive) e a data de vencimento	(exclusive)
     	if (this.isInvalidDateToMovement(newMovement.getDate())) {
     		throw new MovementNotAllowedInDate(ExceptionMessage.MESSAGE_MOVEMENT_NOT_ALLOWED_IN_DATE);
     	}
