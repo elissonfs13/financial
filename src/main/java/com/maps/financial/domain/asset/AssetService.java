@@ -6,12 +6,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.maps.financial.exceptions.AuthorizationException;
 import com.maps.financial.exceptions.ExceptionMessage;
 import com.maps.financial.exceptions.IssueDateNotBeforeDueDate;
 import com.maps.financial.exceptions.ObjectNotFoundException;
+import com.maps.financial.infra.security.SecurityUtils;
 
 @Service
 public class AssetService {
@@ -19,7 +24,17 @@ public class AssetService {
 	@Autowired
 	private AssetRepository repository;
 	
+	@Autowired
+	private SecurityUtils securityUtils;
+	
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	
+	@PostConstruct
+    public void init() {
+		for (Integer i = 0; i < 128; i++) {
+			preRegistration("ATIVO".concat(i.toString()));
+		}
+	}
 	
 	public Asset findById(final Long id)  throws ObjectNotFoundException {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(id, Asset.class));
@@ -30,6 +45,11 @@ public class AssetService {
 	}
 	
 	public Asset create(final Asset asset) {
+		//Validação: ativo só pode ser incluído por usuário com privilégio administrativo
+		if (isUserUnauthorized(Boolean.TRUE)) {
+			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
+		}
+		
 		//Validação: data de emissão deve ser sempre anterior a data de vencimento
 		if (asset.getIssueDate() == null || asset.getDueDate() == null || 
 				!asset.getIssueDate().isBefore(asset.getDueDate())) {
@@ -40,6 +60,11 @@ public class AssetService {
 	}
 	
 	public Asset update(final Long assetId, final Asset assetUpdate) {
+		//Validação: ativo só pode ser alterado por usuário com privilégio administrativo
+		if (isUserUnauthorized(Boolean.TRUE)) {
+			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
+		}
+		
 		Asset asset = findById(assetId);
 		asset.setName(assetUpdate.getName());
 		asset.setType(assetUpdate.getType());
@@ -47,11 +72,21 @@ public class AssetService {
 	}
 	
 	public void delete(final Long assetId) {
+		//Validação: ativo só pode ser excluído por usuário com privilégio administrativo
+		if (isUserUnauthorized(Boolean.TRUE)) {
+			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
+		}
+				
 		Asset asset = findById(assetId);
 		repository.delete(asset);
 	}
 	
 	public Asset includeMovement(final Long assetId, final AssetMovement newMovement) {
+		//Validação: usuário administrativo não deve poder gerar lançamentos e movimentos
+		if (isUserUnauthorized(Boolean.FALSE)) {
+			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
+		}
+		
 		Asset asset = findById(assetId);
 		newMovement.setAsset(asset);
 		asset.includeMovement(newMovement);
@@ -101,6 +136,31 @@ public class AssetService {
 				.collect(Collectors.toList());
 		
 		return movements;
+	}
+	
+	/**
+	 * Método responsável por verificar se o usuário logado está autorizado ou não a realizar uma ação
+	 * 
+	 * @param proceedByAdmin
+	 * @return boolean
+	 */
+	private boolean isUserUnauthorized(Boolean proceedByAdmin) {
+		return proceedByAdmin ? !securityUtils.currentUserIsAdmin() : securityUtils.currentUserIsAdmin();
+	}
+	
+	@Transactional
+	private void preRegistration(String name) {
+		Asset asset = repository.save(createAsset(name));
+		asset.includeMarketPrice(new BigDecimal(10.00), LocalDate.of(2020, 1, 2));
+	}
+	
+	private Asset createAsset(String name) {
+		return Asset.builder()
+				.name(name)
+				.type(AssetType.RF)
+				.issueDate(LocalDate.of(2020, 1, 1))
+				.dueDate(LocalDate.of(2020, 12, 31))
+				.build();
 	}
 
 }

@@ -11,9 +11,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.maps.financial.domain.user.User;
 import com.maps.financial.exceptions.AccountBalanceNotAvailable;
 import com.maps.financial.exceptions.ExceptionMessage;
 
@@ -39,6 +42,10 @@ public class Account {
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
 	private final List<Launch> launches = new ArrayList<>();
+	
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @OneToOne(optional = false)
+    private User user;
 	
 	/**
 	 * Método responsável por subtrair o saldo da conta pelo valor do novo lançamento.

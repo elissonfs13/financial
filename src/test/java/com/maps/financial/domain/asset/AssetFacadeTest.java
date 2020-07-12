@@ -29,7 +29,6 @@ public class AssetFacadeTest {
 	private AccountFacade accountFacade;
 	
 	private static final Long ASSET_ID = 1L;
-	private static final Long ACCOUNT_ID = 2L;
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Asset asset;
 	
@@ -122,7 +121,7 @@ public class AssetFacadeTest {
 	@Test
 	public void includeMovementTest() {
 		AssetMovement movement = AssetMovement.builder().build();
-		facade.includeMovement(ACCOUNT_ID, ASSET_ID, movement);
+		facade.includeMovement(ASSET_ID, movement);
 		//verify(accountFacade, times(1)).includeLaunch(ACCOUNT_ID, movement);
 		verify(service, times(1)).includeMovement(ASSET_ID, movement);
 	}

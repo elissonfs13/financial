@@ -142,8 +142,7 @@ public class AssetResource {
 	 */
 	@PostMapping("/{assetId}/movimentacao")
 	public ResponseEntity<AssetDTO> includeMovement(@PathVariable final Long assetId, @RequestBody final AssetMovementDTO assetMovementDTO) {
-		//TODO: Fazer mapeamento devido com Account
-		final Asset asset = assetFacade.includeMovement(1L, assetId, modelMapper.map(assetMovementDTO, AssetMovement.class));
+		final Asset asset = assetFacade.includeMovement(assetId, modelMapper.map(assetMovementDTO, AssetMovement.class));
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(asset.getId()).toUri();
 		return ResponseEntity
 				.created(uri)

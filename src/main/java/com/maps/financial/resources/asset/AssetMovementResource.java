@@ -34,7 +34,7 @@ public class AssetMovementResource {
 	 */
 	@PostMapping("/compra")
 	public ResponseEntity<AssetMovementDTO> movementBuy(@RequestBody final AssetMovementDTO assetMovementDTO) {
-		final Asset movement = assetFacade.includeMovement(1L, 1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
+		final Asset movement = assetFacade.includeMovement(1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(movement.getId()).toUri();
 		return ResponseEntity
 				.created(uri)
@@ -49,7 +49,7 @@ public class AssetMovementResource {
 	 */
 	@PostMapping("/venda")
 	public ResponseEntity<AssetMovementDTO> movementSell(@RequestBody final AssetMovementDTO assetMovementDTO) {
-		final Asset movement = assetFacade.includeMovement(1L, 1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
+		final Asset movement = assetFacade.includeMovement(1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(movement.getId()).toUri();
 		return ResponseEntity
 				.created(uri)
