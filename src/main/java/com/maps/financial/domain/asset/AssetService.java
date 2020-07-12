@@ -2,6 +2,7 @@ package com.maps.financial.domain.asset;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,8 @@ public class AssetService {
 	
 	@Autowired
 	private AssetRepository repository;
+	
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
 	public Asset findById(final Long id)  throws ObjectNotFoundException {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundException(id, Asset.class));
@@ -50,6 +53,7 @@ public class AssetService {
 	
 	public Asset includeMovement(final Long assetId, final AssetMovement newMovement) {
 		Asset asset = findById(assetId);
+		newMovement.setAsset(asset);
 		asset.includeMovement(newMovement);
 		return asset;
 	}
@@ -80,13 +84,16 @@ public class AssetService {
 		return asset;
 	}
 	
-	public Asset excludeMarketPrice(final Long assetId, final LocalDate date) {
+	public Asset excludeMarketPrice(final Long assetId, final String data) {
+		LocalDate date = LocalDate.parse(data, formatter);
 		Asset asset = findById(assetId);
 		asset.excludeMarketPrice(date);
 		return asset;
 	}
 	
-	public List<AssetMovement> getMovements(Long assetId, LocalDate dateBegin, LocalDate dateEnd) {
+	public List<AssetMovement> getMovements(Long assetId, String dataInicio, String dataFim) {
+		LocalDate dateBegin = LocalDate.parse(dataInicio, formatter);
+		LocalDate dateEnd = LocalDate.parse(dataFim, formatter);
 		Asset asset = findById(assetId);
 		List<AssetMovement> movements = asset.getMovements()
 				.stream()

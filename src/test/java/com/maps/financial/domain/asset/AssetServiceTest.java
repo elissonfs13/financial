@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +40,7 @@ public class AssetServiceTest {
 	private static final String NAME_UPDATED = "NAME_UPDATED";
 	private static final LocalDate DATA_FIRST_MARKET_PRICE = LocalDate.of(2020, 6, 21);
 	private static final BigDecimal VALUE_FIRST_MARKET_PRICE = new BigDecimal(1.00);
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private Asset asset;
 	private List<Asset> assets;
@@ -275,7 +277,7 @@ public class AssetServiceTest {
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
 		assertEquals(1, asset.getMarketPrices().size());
-		Asset assetReturned = service.excludeMarketPrice(ASSET_ID, DATA_FIRST_MARKET_PRICE);
+		Asset assetReturned = service.excludeMarketPrice(ASSET_ID, DATA_FIRST_MARKET_PRICE.format(formatter));
 		assertNotNull(assetReturned);
 		assertEquals(0, assetReturned.getMarketPrices().size());
 		assertEquals(formatBigDecimalScale(0.00), assetReturned.getTotalMarketPrice(LocalDate.of(2020, 7, 10)));
@@ -290,7 +292,7 @@ public class AssetServiceTest {
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
 		assertEquals(2, asset.getMarketPrices().size());
-		Asset assetReturned = service.excludeMarketPrice(ASSET_ID, DATA_FIRST_MARKET_PRICE);
+		Asset assetReturned = service.excludeMarketPrice(ASSET_ID, DATA_FIRST_MARKET_PRICE.format(formatter));
 		assertNotNull(assetReturned);
 		assertEquals(1, assetReturned.getMarketPrices().size());
 		assertEquals(priceMarketPrice.setScale(8, BigDecimal.ROUND_DOWN), assetReturned.getMarketPrices().get(0).getPrice());
@@ -389,9 +391,11 @@ public class AssetServiceTest {
 	@Test
 	public void getMovementsTest() {
 		addMovements();
+		String dateBegin = LocalDate.of(2020, 7, 8).format(formatter);
+		String dateEnd = LocalDate.of(2020, 7, 10).format(formatter);
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
-		List<AssetMovement> movementsReturned = service.getMovements(ASSET_ID, LocalDate.of(2020, 7, 8), LocalDate.of(2020, 7, 10));
+		List<AssetMovement> movementsReturned = service.getMovements(ASSET_ID, dateBegin, dateEnd);
 		assertNotNull(movementsReturned);
 		assertEquals(3, movementsReturned.size());	
 		assertEquals(formatBigDecimalScale(5.15), movementsReturned.get(0).getValue());

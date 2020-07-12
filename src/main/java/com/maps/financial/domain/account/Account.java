@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "account")
@@ -32,6 +33,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 	
+	@Setter
 	@Column(precision=10, scale=2)
 	private BigDecimal balance;
 	
@@ -72,7 +74,7 @@ public class Account {
 	}
 	
 	/**
-     * Método responsável por retornar o valor total das movimentações de saída na conta até a data atual
+     * Método responsável por retornar o valor total das movimentações de saída na conta até a data informada
      * 
      * @param atualDate
      * @return BigDecimal
@@ -83,7 +85,7 @@ public class Account {
     	}
     	BigDecimal totalValue = this.getLaunches()
     			.stream()
-    			.filter(launch -> LaunchType.OUTBOUND.equals(launch.getType()) && atualDate.isAfter(launch.getDate()))
+    			.filter(launch -> LaunchType.OUTBOUND.equals(launch.getType()) && !atualDate.isBefore(launch.getDate()))
     			.map(launch -> launch.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -102,7 +104,7 @@ public class Account {
     	}
     	BigDecimal totalValue = this.getLaunches()
     			.stream()
-    			.filter(launch -> LaunchType.INBOUND.equals(launch.getType()) && atualDate.isAfter(launch.getDate()))
+    			.filter(launch -> LaunchType.INBOUND.equals(launch.getType()) && !atualDate.isBefore(launch.getDate()))
     			.map(launch -> launch.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -120,6 +122,7 @@ public class Account {
 		} else {
 			this.updateBalanceInbound(newLaunch.getValue());
 		}
+		newLaunch.setAccount(this);
 		this.launches.add(newLaunch);
 	}
 	
@@ -130,8 +133,11 @@ public class Account {
 	 * @return BigDecimal
 	 */
 	public BigDecimal getBalanceInDate(LocalDate atualDate) {
-		BigDecimal balance = this.getTotalValueInbound(atualDate).subtract(this.getTotalValueOutbound(atualDate));
-		return balance.setScale(2, BigDecimal.ROUND_DOWN);
+		BigDecimal balanceInDate = this.getBalance()
+				.add(this.getTotalValueInbound(atualDate))
+				.subtract(this.getTotalValueOutbound(atualDate));
+		
+		return balanceInDate.setScale(2, BigDecimal.ROUND_DOWN);
 	}
 
 }

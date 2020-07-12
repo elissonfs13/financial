@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,13 +14,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "launch")
@@ -31,19 +31,24 @@ public class Launch {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 	
+	@Setter
 	@Enumerated(EnumType.STRING)
 	private LaunchType type;
 	
+	@Setter
 	private String description;
 	
+	@Setter
 	private BigDecimal value;
 	
+	@Setter
 	@JoinColumn(name = "account_id", referencedColumnName = "id")
 	@ManyToOne
 	private Account account;
 	
+	@Setter
 	@Basic(optional = false)
-	@Temporal(TemporalType.DATE)
+	@Column(name = "date", columnDefinition = "DATE")
 	private LocalDate date; //data do movimento
 	
 	public BigDecimal getValue() {

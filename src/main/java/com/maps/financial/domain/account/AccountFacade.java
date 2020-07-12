@@ -1,7 +1,6 @@
 package com.maps.financial.domain.account;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,10 @@ public class AccountFacade {
 	public List<Account> findAll() {
 		return accountService.findAll();
 	}
+
+	public Account create(Account account) {
+		return accountService.create(account);
+	}
 	
 	@Transactional
 	public Account includeLaunch(final Long id, final Launch newLaunch) {
@@ -42,12 +45,12 @@ public class AccountFacade {
 		return accountService.includeLaunch(id, newLaunch);
 	}
 	
-	public BigDecimal getBalance(final Long accountId, LocalDate date) {
-		return accountService.getBalance(accountId, date);
+	public BigDecimal getBalance(final Long accountId, String data) {
+		return accountService.getBalance(accountId, data);
 	}
 	
-	public List<Launch> getLaunches(final Long accountId, LocalDate dateBegin, LocalDate dateEnd) {
-		return accountService.getLaunches(accountId, dateBegin, dateEnd);
+	public List<Launch> getLaunches(final Long accountId, String dataInicio, String dataFim) {
+		return accountService.getLaunches(accountId, dataInicio, dataFim);
 	}
 	
 	private Launch getLaunchByMovementType(final AssetMovement assetMovement) {

@@ -19,8 +19,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.maps.financial.exceptions.AssetQuantityNotAvailable;
 import com.maps.financial.exceptions.ExceptionMessage;
@@ -60,14 +58,12 @@ public class Asset {
 	
 	@Setter
 	@Basic(optional = false)
-	@Column(name = "issue_date")
-	@Temporal(TemporalType.DATE)
+	@Column(name = "issue_date", columnDefinition = "DATE")
 	private LocalDate issueDate; //data de emissão
 	
 	@Setter
 	@Basic(optional = false)
-	@Column(name = "due_date")
-	@Temporal(TemporalType.DATE)
+	@Column(name = "due_date", columnDefinition = "DATE")
 	private LocalDate dueDate; //data de vencimento
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asset", orphanRemoval = true)
@@ -140,6 +136,7 @@ public class Asset {
 	    	MarketPrice marketPrice = MarketPrice.builder()
 	    			.price(price.setScale(8, BigDecimal.ROUND_DOWN))
 	    			.date(date)
+	    			.asset(this)
 	    			.build();
 	    	
 	    	this.marketPrices.add(marketPrice);
@@ -154,7 +151,7 @@ public class Asset {
     public void excludeMarketPrice(LocalDate date) {
     	List<MarketPrice> marketPricesFind = this.marketPrices
     			.stream()
-    			.filter(p -> p.getDate() == date)
+    			.filter(p -> date.isEqual(p.getDate()))
     			.collect(Collectors.toList());
     	
     	for (MarketPrice marketPrice : marketPricesFind) {

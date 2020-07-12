@@ -1,7 +1,6 @@
 package com.maps.financial.resources.asset.dto;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.math.BigDecimal;
 
 import com.maps.financial.domain.asset.AssetType;
 
@@ -15,14 +14,13 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor 
 @AllArgsConstructor
-public class AssetDTO {
+public class PositionDTO {
 	
-	private Long id;
-    private String name;
-    private AssetType type;
-    private LocalDate issueDate;
-    private LocalDate dueDate;
-    private List<AssetMovementDTO> movements;
-    private List<MarketPriceDTO> marketPrices;
+	public String nomeAtivo;
+	public AssetType tipoAtivo;
+	public BigDecimal quantidadeTotal;
+	public BigDecimal valorMercadoTotal;
+	public BigDecimal rendimento;
+	public BigDecimal lucro;
 
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,7 @@ public class AccountServiceTest {
 	
 	private static final Long ACCOUNT_ID = 1L;
 	private static final String DESCRIPTION = "DESCRIPTION";
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Account account;
 	private List<Account> accounts;
 	
@@ -106,16 +108,13 @@ public class AccountServiceTest {
 		account.includeLaunch(createLaunch(LaunchType.OUTBOUND, 5.20, LocalDate.of(2020, 7, 11))); //Não deve ser considerado no cálculo
 		final Optional<Account> optional = Optional.of(account);	
 		when(repository.findById(ACCOUNT_ID)).thenReturn(optional);
-		BigDecimal valueReturned = service.getBalance(ACCOUNT_ID, LocalDate.of(2020, 7, 10));
+		BigDecimal valueReturned = service.getBalance(ACCOUNT_ID, LocalDate.of(2020, 7, 10).format(formatter));
 		assertNotNull(valueReturned);
-		assertEquals(formatBigDecimalScale(34.30), valueReturned);	
+		assertEquals(formatBigDecimalScale(54.80), valueReturned);	
 	}
 	
 	@Test
 	public void getBalanceWithoutDateTest() {
-		account.includeLaunch(createLaunch(LaunchType.INBOUND, 20.00, LocalDate.of(2020, 7, 9)));
-		final Optional<Account> optional = Optional.of(account);	
-		when(repository.findById(ACCOUNT_ID)).thenReturn(optional);
 		BigDecimal valueReturned = service.getBalance(ACCOUNT_ID, null);
 		assertNotNull(valueReturned);
 		assertEquals(formatBigDecimalScale(0.00), valueReturned);	
@@ -140,7 +139,8 @@ public class AccountServiceTest {
 		account.includeLaunch(createLaunch(LaunchType.OUTBOUND, 5.20, LocalDate.of(2020, 7, 11)));
 		final Optional<Account> optional = Optional.of(account);	
 		when(repository.findById(ACCOUNT_ID)).thenReturn(optional);	
-		final List<Launch> launches = service.getLaunches(ACCOUNT_ID, LocalDate.of(2020, 7, 8), LocalDate.of(2020, 7, 10));
+		final List<Launch> launches = service.getLaunches(ACCOUNT_ID, LocalDate.of(2020, 7, 8).format(formatter), 
+				LocalDate.of(2020, 7, 10).format(formatter));
 		assertNotNull(launches);
 		assertEquals(3, launches.size());	
 		assertEquals(formatBigDecimalScale(5.20), launches.get(0).getValue());

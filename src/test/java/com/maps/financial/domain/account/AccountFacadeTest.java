@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,7 @@ public class AccountFacadeTest {
 	private static final Long ACCOUNT_ID = 1L;
 	private static final String DESCRIPTION_BUY = "LAUNCH FOR A BUY";
 	private static final String DESCRIPTION_SELL = "LAUNCH FOR A SELL";
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
 	@Before
 	public void init() {
@@ -53,8 +55,9 @@ public class AccountFacadeTest {
 	
 	@Test
 	public void getBalanceTest() {
-		facade.getBalance(ACCOUNT_ID, LocalDate.now());
-		verify(service, times(1)).getBalance(ACCOUNT_ID, LocalDate.now());
+		String date = LocalDate.now().format(formatter);
+		facade.getBalance(ACCOUNT_ID, date);
+		verify(service, times(1)).getBalance(ACCOUNT_ID, date);
 	}
 	
 	@Test
@@ -66,8 +69,8 @@ public class AccountFacadeTest {
 	
 	@Test
 	public void getLaunchesTest() {
-		LocalDate dateBegin = LocalDate.now();
-		LocalDate dateEnd = LocalDate.now();
+		String dateBegin = LocalDate.now().format(formatter);
+		String dateEnd = LocalDate.now().format(formatter);
 		facade.getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
 		verify(service, times(1)).getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
 	}

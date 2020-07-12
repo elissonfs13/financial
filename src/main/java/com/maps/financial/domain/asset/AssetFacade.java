@@ -44,7 +44,7 @@ public class AssetFacade {
 	
 	@Transactional
 	public Asset includeMovement(final Long accountId, final Long assetId, final AssetMovement newMovement) {
-		accountFacade.includeLaunch(accountId, newMovement);
+		//accountFacade.includeLaunch(accountId, newMovement);
 		return service.includeMovement(assetId, newMovement);
 	}
 	
@@ -70,12 +70,12 @@ public class AssetFacade {
 	}
 	
 	@Transactional
-	public Asset excludeMarketPrice(final Long assetId, final LocalDate date) {
-		return service.excludeMarketPrice(assetId, date);
+	public Asset excludeMarketPrice(final Long assetId, final String data) {
+		return service.excludeMarketPrice(assetId, data);
 	}
 	
-	public List<AssetMovement> getMovements(Long assetId, LocalDate dateBegin, LocalDate dateEnd) {
-		return service.getMovements(assetId, dateBegin, dateEnd);
+	public List<AssetMovement> getMovements(Long assetId, String dataInicio, String dataFim) {
+		return service.getMovements(assetId, dataInicio, dataFim);
 	}
 
 }

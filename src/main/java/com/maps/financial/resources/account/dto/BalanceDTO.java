@@ -1,9 +1,6 @@
 package com.maps.financial.resources.account.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import com.maps.financial.domain.account.LaunchType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,11 +12,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor 
 @AllArgsConstructor
-public class LaunchDTO {
+public class BalanceDTO {
 	
-	private String description;
-	private BigDecimal value;
-	private LocalDate date;
-	private LaunchType type;
+	private BigDecimal saldo;
 
 }
