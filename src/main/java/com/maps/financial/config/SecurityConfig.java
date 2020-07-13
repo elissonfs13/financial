@@ -9,6 +9,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import com.maps.financial.infra.security.SimpleUserAuthenticationProvider;
 
+/**
+ * Configuração de segurança para autenticação simples.
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -20,7 +27,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 	        .authorizeRequests()
-	        .antMatchers("/").permitAll()
 	        .antMatchers("/h2-console/**").permitAll()
 	        .anyRequest().authenticated()
 	        .and().httpBasic();

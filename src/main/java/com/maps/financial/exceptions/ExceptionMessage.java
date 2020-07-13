@@ -1,5 +1,12 @@
 package com.maps.financial.exceptions;
 
+/**
+ * Enum com as mensagens de erros que podem ser lançadas na aplicação
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 public enum ExceptionMessage {
 	
 	MESSAGE_OBJECT_NOT_FOUND("exception.message.object-not-found"),

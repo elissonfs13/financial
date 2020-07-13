@@ -21,6 +21,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Calsse de Movimentações de Ativos
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Entity
 @Table(name = "movement_asset")
 @Getter
@@ -51,6 +58,11 @@ public class AssetMovement {
 	@Column(name = "date", columnDefinition = "DATE")
 	private LocalDate date; //data do movimento
 	
+	/**
+	 * Retorna o valor da movimentação no formato definido
+	 * 
+	 * @return BigDecimal
+	 */
 	public BigDecimal getValue() {
 		return this.value.setScale(2, BigDecimal.ROUND_DOWN);
 	}

@@ -14,7 +14,13 @@ import com.maps.financial.exceptions.ObjectNotFoundException;
 import com.maps.financial.resources.commons.dto.DefaultErrorDTO;
 
 
-
+/**
+ * Advice para captura de exceções lançadas no sistema
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @RestControllerAdvice
 public class ApplicationControllerAdvice {
 	

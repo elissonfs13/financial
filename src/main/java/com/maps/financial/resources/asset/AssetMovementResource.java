@@ -18,6 +18,13 @@ import com.maps.financial.domain.asset.MovementType;
 import com.maps.financial.resources.asset.dto.AssetDTO;
 import com.maps.financial.resources.asset.dto.AssetMovementDTO;
 
+/**
+ * Resource para Movimentação de Ativo
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @RestController
 @RequestMapping("/movimentacao")
 public class AssetMovementResource {

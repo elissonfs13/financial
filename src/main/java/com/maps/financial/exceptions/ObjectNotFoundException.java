@@ -1,5 +1,12 @@
 package com.maps.financial.exceptions;
 
+/**
+ * Exception será lançada quando um determinado objeto não for encontrado com as informações passadas
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 public class ObjectNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

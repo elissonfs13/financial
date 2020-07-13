@@ -20,9 +20,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * 
- * Classe para Valor de Mercado
+ * Classe para Valor de Mercado de um Ativo
  * 
  * @author Elisson
+ * @date 13/07/2020
  *
  */
 @Entity

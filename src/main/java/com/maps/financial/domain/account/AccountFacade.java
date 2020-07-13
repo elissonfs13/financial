@@ -10,6 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maps.financial.domain.asset.AssetMovement;
 import com.maps.financial.domain.asset.MovementType;
 
+/**
+ * Classe Façade para Conta Corrente
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Component
 public class AccountFacade {
 	
@@ -53,6 +60,12 @@ public class AccountFacade {
 		return accountService.getLaunches(dataInicio, dataFim);
 	}
 	
+	/**
+	 * Define o tipo de lançamento que deverá ser cadastrado de acordo com o tipo de movimentação
+	 * 
+	 * @param assetMovement
+	 * @return Launch
+	 */
 	private Launch getLaunchByMovementType(final AssetMovement assetMovement) {
 		if (MovementType.BUY.equals(assetMovement.getType())) {
 			return launchFactory.generateLaunch(DESCRIPTION_BUY, LaunchType.OUTBOUND, assetMovement.getValue(), assetMovement.getDate());

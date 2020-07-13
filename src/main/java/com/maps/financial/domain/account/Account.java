@@ -26,6 +26,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Classe de Conta Corrente
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Entity
 @Table(name = "account")
 @Getter

@@ -35,6 +35,7 @@ import lombok.Setter;
  * Classe de Ativos Financeiros
  * 
  * @author Elisson
+ * @date 13/07/2020
  *
  */
 @Entity
@@ -75,6 +76,7 @@ public class Asset {
     
     /**
      * Método responsável por calcular e retornar a quantidade total atual do ativo
+     * Quantidade total: soma das quantidades compradas menos as quantidades vendidas do ativo
      * 
      * @return BigDecimal
      */
@@ -84,6 +86,7 @@ public class Asset {
     
     /**
      * Método responsável por calcular e retornar o valor de mercado total atual do ativo
+     * Valor de mercado total: quantidade total multiplicada pelo preço de mercado do ativo
      * 
      * @return BigDecimal
      */
@@ -94,6 +97,7 @@ public class Asset {
     
     /**
      * Método responsável por calcular e retornar o valor do rendimento 
+     * Rendimento: preço de mercado dividido pelo preço médio das compras
      * 
      * @return BigDecimal
      */
@@ -108,6 +112,7 @@ public class Asset {
     
     /**
      * Método responsável por calcular e retornar o valor do lucro 
+     * Lucro: soma dos valores das vendas menos os valores das compras do ativo
      * 
      * @return BigDecimal
      */

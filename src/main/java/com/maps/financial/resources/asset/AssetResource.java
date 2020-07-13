@@ -29,6 +29,13 @@ import com.maps.financial.resources.asset.dto.AssetMovementDTO;
 import com.maps.financial.resources.asset.dto.MarketPriceDTO;
 import com.maps.financial.resources.asset.dto.PositionDTO;
 
+/**
+ * Resource para Ativo
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @RestController
 @RequestMapping("/ativo")
 public class AssetResource {

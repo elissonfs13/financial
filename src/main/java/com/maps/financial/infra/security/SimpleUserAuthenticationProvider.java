@@ -14,12 +14,25 @@ import com.maps.financial.domain.user.User;
 import com.maps.financial.domain.user.UserService;
 import com.maps.financial.exceptions.ExceptionMessage;
 
+/**
+ * Provider para realização de uma autenticação simples de usuário
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Component
 public class SimpleUserAuthenticationProvider implements AuthenticationProvider {
 	
 	@Autowired
 	private UserService userService;
 	
+	/**
+	 * Simples autenticação com usuário cadastrado no banco de dados.
+	 * Deve ser implementado algum mecanismos de autenticação. As credenciais devem ser recebidas
+	 *		através de cabeçalho HTTP Basic, em todas as requisições.
+	 * 
+	 */
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         String username = auth.getName();

@@ -10,6 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maps.financial.domain.account.AccountFacade;
 
+/**
+ * Classe Façade para Ativos Financeiros
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Component
 public class AssetFacade {
 	
@@ -42,12 +49,28 @@ public class AssetFacade {
 		service.delete(assetId);
 	}
 	
+	/**
+	 * Chamada para inclusão de lançamento da conta corrente do usuário logado e movimentação no ativo com id especificado
+	 * Compras e vendas devem gerar lançamentos na conta corrente refletindo o valor gasto ou ganho.
+	 * 
+	 * @param assetId
+	 * @param newMovement
+	 * @return Asset
+	 */
 	@Transactional
 	public Asset includeMovement(final Long assetId, final AssetMovement newMovement) {
 		accountFacade.includeLaunch(newMovement);
 		return service.includeMovementByAssetId(assetId, newMovement);
 	}
 	
+	/**
+	 * Chamada para inclusão de lançamento da conta corrente do usuário logado e movimentação no ativo com nome especificado
+	 * Compras e vendas devem gerar lançamentos na conta corrente refletindo o valor gasto ou ganho.
+	 * 
+	 * @param assetName
+	 * @param newMovement
+	 * @return Asset
+	 */
 	@Transactional
 	public Asset includeMovement(final String assetName, final AssetMovement newMovement) {
 		accountFacade.includeLaunch(newMovement);

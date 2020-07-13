@@ -23,6 +23,13 @@ import com.maps.financial.resources.account.dto.AccountDTO;
 import com.maps.financial.resources.account.dto.BalanceDTO;
 import com.maps.financial.resources.account.dto.LaunchDTO;
 
+/**
+ * Resource para Conta Corrente
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @RestController
 @RequestMapping("/contacorrente")
 public class AccountResource {

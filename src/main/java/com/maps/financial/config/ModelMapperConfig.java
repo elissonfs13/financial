@@ -8,6 +8,13 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
+/**
+ * Configuração do ModelMapper
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Configuration
 public class ModelMapperConfig {
 	

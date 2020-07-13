@@ -27,6 +27,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Classe de Usuários da aplicação
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Entity
 @Table(name = "user")
 @Getter

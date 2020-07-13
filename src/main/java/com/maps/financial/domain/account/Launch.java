@@ -21,6 +21,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Classe de Lançamentos da Conta Corrente
+ * 
+ * @author Elisson
+ * @date 13/07/2020
+ *
+ */
 @Entity
 @Table(name = "launch")
 @Getter
@@ -51,6 +58,11 @@ public class Launch {
 	@Column(name = "date", columnDefinition = "DATE")
 	private LocalDate date; //data do movimento
 	
+	/**
+	 * Retorna o valor do lançamento no formato definido
+	 * 
+	 * @return BigDecimal
+	 */
 	public BigDecimal getValue() {
 		return this.value.setScale(2, BigDecimal.ROUND_DOWN);
 	}
