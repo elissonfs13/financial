@@ -123,7 +123,7 @@ public class AssetFacadeTest {
 		AssetMovement movement = AssetMovement.builder().build();
 		facade.includeMovement(ASSET_ID, movement);
 		//verify(accountFacade, times(1)).includeLaunch(ACCOUNT_ID, movement);
-		verify(service, times(1)).includeMovement(ASSET_ID, movement);
+		verify(service, times(1)).includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	private Asset createAsset() {

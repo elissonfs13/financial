@@ -3,6 +3,7 @@ package com.maps.financial.resources.asset.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.maps.financial.domain.asset.MovementType;
 
 import lombok.AllArgsConstructor;
@@ -18,9 +19,19 @@ import lombok.Setter;
 public class AssetMovementDTO {
 	
 	private Long id;
+	
+	@JsonProperty("quantidade")
 	private BigDecimal quantity;
+	
+	@JsonProperty("valor")
 	private BigDecimal value;
+	
+	@JsonProperty("data")
 	private LocalDate date;
+	
+	@JsonProperty("tipo")
 	private MovementType type;
+	
+	private String ativo;
 
 }

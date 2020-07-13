@@ -30,6 +30,8 @@ public class UserService {
 			preRegistration("usuario".concat(i.toString()), "senha".concat(i.toString()), 
 					JobFunction.USER, BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN));
 		}
+		// Usuário criado para o teste de integração
+		preRegistration("usuario-teste", "integracao", JobFunction.USER, new BigDecimal(1000.00));
     }
 	
 	public User create(final String username, final String password, final JobFunction jobFunction) {

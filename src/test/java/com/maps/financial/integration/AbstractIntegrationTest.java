@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,8 +39,12 @@ public abstract class AbstractIntegrationTest {
 	protected static final ResultMatcher CREATED = status().isCreated(); 
 	protected static final ResultMatcher OK = status().isOk(); 
 	protected static final ResultMatcher FORBIDDEN = status().isForbidden(); 
-	protected static final ResultMatcher NOT_FOUND = status().isNotFound();
-	protected static final ResultMatcher BAD_REQUEST = status().isBadRequest();
+	protected static final ResultMatcher NO_CONTENT = status().isNoContent();
+	protected static final ResultMatcher NOT_ACCEPTABLE = status().isNotAcceptable();
+	protected static final ResultMatcher UNAUTHORIZED = status().isUnauthorized();
+	
+	protected static final String TOKEN_ADMIN = "root:spiderman";
+	protected static final String TOKEN_USER = "usuario-teste:integracao";
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -67,6 +73,7 @@ public abstract class AbstractIntegrationTest {
 	 * Realiza uma requisição do tipo GET
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
 	 * @param params Parametros que serão adicionados a URL ?param=...
@@ -74,31 +81,36 @@ public abstract class AbstractIntegrationTest {
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T getForObject(final String url, final ResultMatcher resultMatcher, final Class<T> clazz,
+	protected <T> T getForObject(final String url, final String token, final ResultMatcher resultMatcher, final Class<T> clazz,
 			final MultiValueMap<String, String> params, final Object... uriVars) throws Exception {
-		return getResultObject(mockMvc.perform(get(url, uriVars).params(params)).andExpect(resultMatcher).andReturn(),
-				clazz);
+		return getResultObject(mockMvc.perform(get(url, uriVars)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes()))
+				.params(params)).andExpect(resultMatcher).andReturn(), clazz);
 	}
 	
 	/**
 	 * Realiza uma requisição do tipo GET
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
 	 * @param uriVars Variáveis da URL, ex: /assets/{assetId}
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T getForObject(final String url, final ResultMatcher resultMatcher, final Class<T> clazz,
-			final Object... uriVars) throws Exception {
-		return getResultObject(mockMvc.perform(get(url, uriVars)).andExpect(resultMatcher).andReturn(), clazz);
+	protected <T> T getForObject(final String url, final String token, final ResultMatcher resultMatcher, 
+			final Class<T> clazz, final Object... uriVars) throws Exception {
+		return getResultObject(mockMvc.perform(get(url, uriVars)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes())))
+				.andExpect(resultMatcher).andReturn(), clazz);
 	}
 	
 	/**
 	 * Realiza uma requisição do tipo GET para endpoints que retornam um <code>Page</code>
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
 	 * @param params params Parametros que serão adicionados a URL ?param=...
@@ -106,9 +118,11 @@ public abstract class AbstractIntegrationTest {
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T getForList(final String url, final ResultMatcher resultMatcher, final Class<T> clazz,
+	protected <T> T getForList(final String url, final String token, final ResultMatcher resultMatcher, final Class<T> clazz,
 			final MultiValueMap<String, String> params, final Object... uriVars) throws Exception {
-		final MvcResult result = mockMvc.perform(get(url, uriVars).params(params)).andExpect(resultMatcher).andReturn();
+		final MvcResult result = mockMvc.perform(get(url, uriVars)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes()))
+				.params(params)).andExpect(resultMatcher).andReturn();
 		return mapper.readValue(result.getResponse().getContentAsString(), clazz);
 	}
 
@@ -116,6 +130,7 @@ public abstract class AbstractIntegrationTest {
 	 * Realiza uma requisição do tipo POST
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param content Conteudo da requisição
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
@@ -123,10 +138,11 @@ public abstract class AbstractIntegrationTest {
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T postForObject(final String url, final Object content, final ResultMatcher resultMatcher,
+	protected <T> T postForObject(final String url, final String token, final Object content, final ResultMatcher resultMatcher,
 			final Class<T> clazz, final Object... uriVars) throws Exception {
 		return getResultObject(mockMvc.perform(
-				post(url, uriVars).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(content)))
+				post(url, uriVars).header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes()))
+				.contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(content)))
 				.andExpect(resultMatcher).andReturn(), clazz);
 	}
 
@@ -134,6 +150,7 @@ public abstract class AbstractIntegrationTest {
 	 * Realiza uma requisição do tipo PUT
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param content Conteudo da requisição
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
@@ -141,10 +158,12 @@ public abstract class AbstractIntegrationTest {
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T putForObject(final String url, final Object content, final ResultMatcher resultMatcher,
-			final Class<T> clazz, final Object... uriVars) throws Exception {
+	protected <T> T putForObject(final String url, final String token, final Object content, 
+			final ResultMatcher resultMatcher, final Class<T> clazz, final Object... uriVars) throws Exception {
 		return getResultObject(mockMvc.perform(
-				put(url, uriVars).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(content)))
+				put(url, uriVars).contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes()))
+				.content(mapper.writeValueAsString(content)))
 				.andExpect(resultMatcher).andReturn(), clazz);
 	}
 	
@@ -152,6 +171,7 @@ public abstract class AbstractIntegrationTest {
 	 * Realiza uma requisição do tipo PUT
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
 	 * @param params params Parametros que serão adicionados a URL ?param=...
@@ -159,9 +179,11 @@ public abstract class AbstractIntegrationTest {
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T putForObject(final String url, final ResultMatcher resultMatcher, final Class<T> clazz, 
+	protected <T> T putForObject(final String url, final String token, final ResultMatcher resultMatcher, final Class<T> clazz, 
 			final MultiValueMap<String, String> params, final Object... uriVars) throws Exception {
-		return getResultObject(mockMvc.perform(put(url, uriVars).params(params)).andExpect(resultMatcher).andReturn(), clazz);
+		return getResultObject(mockMvc.perform(put(url, uriVars)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes()))
+				.params(params)).andExpect(resultMatcher).andReturn(), clazz);
 	}
 	
 	
@@ -170,15 +192,18 @@ public abstract class AbstractIntegrationTest {
 	 * Realiza uma requisição do tipo DELETE
 	 * 
 	 * @param url URL do endpoint
+	 * @param token Usuário e senha para geração do token de autenticação
 	 * @param resultMatcher Resultado esperado (OK, FORBIDDEN, BAD_REQUEST, CREATED)
 	 * @param clazz Tipo do retorno
 	 * @param uriVars Variáveis da URL
 	 * @return
 	 * @throws Exception
 	 */
-	protected <T> T deleteObject(final String url, final ResultMatcher resultMatcher, final Class<T> clazz,
-			final Object... uriVars) throws Exception {
-		return getResultObject(mockMvc.perform(delete(url, uriVars)).andExpect(resultMatcher).andReturn(), clazz);
+	protected <T> T deleteObject(final String url, final String token, final ResultMatcher resultMatcher, 
+			final Class<T> clazz, final Object... uriVars) throws Exception {
+		return getResultObject(mockMvc.perform(delete(url, uriVars)
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64Utils.encodeToString(token.getBytes())))
+				.andExpect(resultMatcher).andReturn(), clazz);
 	}
 
 	

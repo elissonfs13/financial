@@ -35,22 +35,22 @@ public class AccountFacade {
 	}
 	
 	@Transactional
-	public Account includeLaunch(final Long id, final Launch newLaunch) {
-		return accountService.includeLaunch(id, newLaunch);
+	public Account includeLaunch(final Launch newLaunch) {
+		return accountService.includeLaunch(newLaunch);
 	}
 	
 	@Transactional
-	public Account includeLaunch(final Long id, final AssetMovement assetMovement) {
-		Launch newLaunch = this.getLaunchByMovementType(assetMovement);
-		return accountService.includeLaunch(id, newLaunch);
+	public Account includeLaunch(final AssetMovement assetMovement) {
+		Launch newLaunch = getLaunchByMovementType(assetMovement);
+		return accountService.includeLaunch(newLaunch);
 	}
 	
-	public BigDecimal getBalance(final Long accountId, String data) {
-		return accountService.getBalance(accountId, data);
+	public BigDecimal getBalance(String data) {
+		return accountService.getBalance(data);
 	}
 	
-	public List<Launch> getLaunches(final Long accountId, String dataInicio, String dataFim) {
-		return accountService.getLaunches(accountId, dataInicio, dataFim);
+	public List<Launch> getLaunches(String dataInicio, String dataFim) {
+		return accountService.getLaunches(dataInicio, dataFim);
 	}
 	
 	private Launch getLaunchByMovementType(final AssetMovement assetMovement) {

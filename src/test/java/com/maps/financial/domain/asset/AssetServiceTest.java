@@ -22,15 +22,20 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.maps.financial.exceptions.AssetQuantityNotAvailable;
+import com.maps.financial.exceptions.AuthorizationException;
 import com.maps.financial.exceptions.IssueDateNotBeforeDueDate;
 import com.maps.financial.exceptions.MovementNotAllowedInDate;
 import com.maps.financial.exceptions.ObjectNotFoundException;
+import com.maps.financial.infra.security.SecurityUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssetServiceTest {
 	
 	@Mock
 	private AssetRepository repository;
+	
+	@Mock
+	private SecurityUtils securityUtils;
 	
 	@InjectMocks
 	private AssetService service;
@@ -79,6 +84,15 @@ public class AssetServiceTest {
 	@Test
 	public void createTest() {
 		when(repository.save(asset)).thenReturn(asset);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
+		final Asset assetReturned = service.create(asset);			
+		assertEquals(asset, assetReturned);	
+		verify(repository, times(1)).save(asset);
+	}
+	
+	@Test(expected = AuthorizationException.class)
+	public void createWithUserNotAdminTest() {
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		final Asset assetReturned = service.create(asset);			
 		assertEquals(asset, assetReturned);	
 		verify(repository, times(1)).save(asset);
@@ -86,6 +100,7 @@ public class AssetServiceTest {
 	
 	@Test(expected = IssueDateNotBeforeDueDate.class)
 	public void createWithoutIssueDateTest() {
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
 		Asset asset = Asset.builder()
 				 .id(ASSET_ID)
 				 .type(AssetType.RF)
@@ -98,6 +113,7 @@ public class AssetServiceTest {
 	
 	@Test(expected = IssueDateNotBeforeDueDate.class)
 	public void createWithoutDueDateTest() {
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
 		Asset asset = Asset.builder()
 				 .id(ASSET_ID)
 				 .type(AssetType.RF)
@@ -110,6 +126,7 @@ public class AssetServiceTest {
 	
 	@Test(expected = IssueDateNotBeforeDueDate.class)
 	public void createWithIssueDateGreaterThanDueDateTest() {
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
 		Asset asset = Asset.builder()
 				 .id(ASSET_ID)
 				 .type(AssetType.RF)
@@ -125,6 +142,7 @@ public class AssetServiceTest {
 	public void updateTest() {		
 		final Optional<Asset> optional = Optional.of(asset);	
 		when(repository.findById(ASSET_ID)).thenReturn(optional);	
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
 		
 		final Asset assetUpdate = Asset.builder()
 				.id(100L)
@@ -137,20 +155,40 @@ public class AssetServiceTest {
 		assertNotEquals(assetUpdate.getId(), assetReturned.getId());
 	}
 	
+	@Test(expected = AuthorizationException.class)
+	public void updateWithUserNotAdminTest() {		
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
+		
+		final Asset assetUpdate = Asset.builder()
+				.id(100L)
+				.name(NAME_UPDATED)
+				.build();
+		
+		service.update(ASSET_ID, assetUpdate);	
+	}
+	
 	@Test
 	public void deleteTest() {
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
 		service.delete(ASSET_ID);		
 		verify(repository, times(1)).delete(asset);
+	}
+	
+	@Test(expected = AuthorizationException.class)
+	public void deleteWithUserNotAdminTest() {
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
+		service.delete(ASSET_ID);		
 	}
 	
 	@Test
 	public void includeMovementBuyTest() {
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(1L, MovementType.BUY, 1.00, 1.00, LocalDate.of(2020, 7, 10));
-		Asset assetReturned = service.includeMovement(ASSET_ID, movement);
+		Asset assetReturned = service.includeMovementByAssetId(ASSET_ID, movement);
 		assertNotNull(assetReturned);
 		assertEquals(1, assetReturned.getMovements().size());	
 		assertEquals(movement, assetReturned.getMovements().get(0));	
@@ -160,8 +198,18 @@ public class AssetServiceTest {
 	public void includeMovementSellWithoutQuantityTest() {
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(1L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2020, 7, 10));
-		service.includeMovement(ASSET_ID, movement);
+		service.includeMovementByAssetId(ASSET_ID, movement);
+	}
+	
+	@Test(expected = AuthorizationException.class)
+	public void includeMovementWithUserAdminTest() {
+		final Optional<Asset> optional = Optional.of(asset);
+		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.TRUE);
+		AssetMovement movement = createAssetMovement(1L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2020, 7, 10));
+		service.includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	@Test
@@ -169,8 +217,9 @@ public class AssetServiceTest {
 		asset.includeMovement(createAssetMovement(1L, MovementType.BUY, 4.00, 4.00, LocalDate.of(2020, 7, 10)));
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(2L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2020, 7, 10));
-		Asset assetReturned = service.includeMovement(ASSET_ID, movement);
+		Asset assetReturned = service.includeMovementByAssetId(ASSET_ID, movement);
 		assertNotNull(assetReturned);
 		assertEquals(2, assetReturned.getMovements().size());	
 		assertEquals(movement, assetReturned.getMovements().get(1));
@@ -181,8 +230,9 @@ public class AssetServiceTest {
 		asset.includeMovement(createAssetMovement(1L, MovementType.BUY, 4.00, 4.00, LocalDate.of(2020, 7, 10)));
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(2L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2020, 2, 28));
-		service.includeMovement(ASSET_ID, movement);
+		service.includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	@Test(expected = MovementNotAllowedInDate.class)
@@ -190,8 +240,9 @@ public class AssetServiceTest {
 		asset.includeMovement(createAssetMovement(1L, MovementType.BUY, 4.00, 4.00, LocalDate.of(2020, 7, 10)));
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(2L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2021, 2, 28));
-		service.includeMovement(ASSET_ID, movement);
+		service.includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	@Test(expected = MovementNotAllowedInDate.class)
@@ -199,17 +250,19 @@ public class AssetServiceTest {
 		asset.includeMovement(createAssetMovement(1L, MovementType.BUY, 4.00, 4.00, LocalDate.of(2020, 7, 10)));
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		AssetMovement movement = createAssetMovement(2L, MovementType.SELL, 1.00, 1.00, asset.getDueDate());
-		service.includeMovement(ASSET_ID, movement);
+		service.includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	@Test(expected = MovementNotAllowedInDate.class)
 	public void includeMovementInWeekend() {
 		asset.includeMovement(createAssetMovement(1L, MovementType.BUY, 4.00, 4.00, LocalDate.of(2020, 7, 10)));
+		when(securityUtils.currentUserIsAdmin()).thenReturn(Boolean.FALSE);
 		final Optional<Asset> optional = Optional.of(asset);
 		when(repository.findById(ASSET_ID)).thenReturn(optional);
 		AssetMovement movement = createAssetMovement(2L, MovementType.SELL, 1.00, 1.00, LocalDate.of(2020, 7, 11)); // 11/07/2020 é sábado
-		service.includeMovement(ASSET_ID, movement);
+		service.includeMovementByAssetId(ASSET_ID, movement);
 	}
 	
 	@Test

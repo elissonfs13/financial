@@ -56,23 +56,23 @@ public class AccountFacadeTest {
 	@Test
 	public void getBalanceTest() {
 		String date = LocalDate.now().format(formatter);
-		facade.getBalance(ACCOUNT_ID, date);
-		verify(service, times(1)).getBalance(ACCOUNT_ID, date);
+		facade.getBalance(date);
+		verify(service, times(1)).getBalance(date);
 	}
 	
 	@Test
 	public void includeLaunchWithLaunchTest() {
 		Launch launch = Launch.builder().build();
-		facade.includeLaunch(ACCOUNT_ID, launch);
-		verify(service, times(1)).includeLaunch(ACCOUNT_ID, launch);
+		facade.includeLaunch(launch);
+		verify(service, times(1)).includeLaunch(launch);
 	}
 	
 	@Test
 	public void getLaunchesTest() {
 		String dateBegin = LocalDate.now().format(formatter);
 		String dateEnd = LocalDate.now().format(formatter);
-		facade.getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
-		verify(service, times(1)).getLaunches(ACCOUNT_ID, dateBegin, dateEnd);
+		facade.getLaunches(dateBegin, dateEnd);
+		verify(service, times(1)).getLaunches(dateBegin, dateEnd);
 	}
 	
 	@Test
@@ -84,12 +84,12 @@ public class AccountFacadeTest {
 		when(launchFactory.generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class))).thenReturn(launch);
 		
-		facade.includeLaunch(ACCOUNT_ID, movement);
+		facade.includeLaunch(movement);
 		verify(launchFactory, times(1)).generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class));
 		verify(launchFactory, times(1)).generateLaunch(DESCRIPTION_BUY, LaunchType.OUTBOUND, value, date);
-		verify(service, times(1)).includeLaunch(Mockito.any(Long.class), Mockito.any(Launch.class));
-		verify(service, times(1)).includeLaunch(ACCOUNT_ID, launch);
+		verify(service, times(1)).includeLaunch(Mockito.any(Launch.class));
+		verify(service, times(1)).includeLaunch(launch);
 	}
 	
 	@Test
@@ -101,22 +101,22 @@ public class AccountFacadeTest {
 		when(launchFactory.generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class))).thenReturn(launch);
 		
-		facade.includeLaunch(ACCOUNT_ID, movement);
+		facade.includeLaunch(movement);
 		verify(launchFactory, times(1)).generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class));
 		verify(launchFactory, times(1)).generateLaunch(DESCRIPTION_SELL, LaunchType.INBOUND, value, date);
-		verify(service, times(1)).includeLaunch(Mockito.any(Long.class), Mockito.any(Launch.class));
-		verify(service, times(1)).includeLaunch(ACCOUNT_ID, launch);
+		verify(service, times(1)).includeLaunch(Mockito.any(Launch.class));
+		verify(service, times(1)).includeLaunch(launch);
 	}
 	
 	@Test
 	public void includeLaunchWithAssetMovementConsultTest() {
 		AssetMovement movement = AssetMovement.builder().type(MovementType.CONSULT).build();
-		facade.includeLaunch(ACCOUNT_ID, movement);
+		facade.includeLaunch(movement);
 		verify(launchFactory, times(0)).generateLaunch(Mockito.anyString(), Mockito.any(LaunchType.class), 
 				Mockito.any(BigDecimal.class), Mockito.any(LocalDate.class));
-		verify(service, times(1)).includeLaunch(Mockito.any(Long.class), Mockito.isNull());
-		verify(service, times(1)).includeLaunch(ACCOUNT_ID, null);
+		verify(service, times(1)).includeLaunch(Mockito.isNull());
+		verify(service, times(1)).includeLaunch(null);
 	}
 
 }

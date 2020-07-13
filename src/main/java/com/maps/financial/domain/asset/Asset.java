@@ -49,6 +49,7 @@ public class Asset {
  
 	@Setter
 	@Basic(optional = false)
+	@Column(unique=true)
     private String name;
  
 	@Setter

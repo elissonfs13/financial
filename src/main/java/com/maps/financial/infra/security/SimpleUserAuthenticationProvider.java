@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.maps.financial.domain.user.User;
 import com.maps.financial.domain.user.UserService;
+import com.maps.financial.exceptions.ExceptionMessage;
 
 @Component
 public class SimpleUserAuthenticationProvider implements AuthenticationProvider {
@@ -31,7 +32,7 @@ public class SimpleUserAuthenticationProvider implements AuthenticationProvider 
         	}
         }
  
-        throw new BadCredentialsException("External system authentication failed");
+        throw new BadCredentialsException(ExceptionMessage.MESSAGE_AUTHENTICATION_FAILED.name());
     }
  
     @Override

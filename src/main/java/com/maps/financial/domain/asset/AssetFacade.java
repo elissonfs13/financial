@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maps.financial.domain.account.AccountFacade;
-import com.maps.financial.domain.user.User;
-import com.maps.financial.infra.security.SecurityUtils;
 
 @Component
 public class AssetFacade {
@@ -20,9 +18,6 @@ public class AssetFacade {
 	
 	@Autowired
 	private AccountFacade accountFacade;
-	
-	@Autowired
-	private SecurityUtils securityUtils;
 	
 	public Asset findById(final Long id){
 		return service.findById(id);
@@ -49,8 +44,14 @@ public class AssetFacade {
 	
 	@Transactional
 	public Asset includeMovement(final Long assetId, final AssetMovement newMovement) {
-		accountFacade.includeLaunch(getAccountIdOfCurrentUser(), newMovement);
-		return service.includeMovement(assetId, newMovement);
+		accountFacade.includeLaunch(newMovement);
+		return service.includeMovementByAssetId(assetId, newMovement);
+	}
+	
+	@Transactional
+	public Asset includeMovement(final String assetName, final AssetMovement newMovement) {
+		accountFacade.includeLaunch(newMovement);
+		return service.includeMovementByAssetName(assetName, newMovement);
 	}
 	
 	public BigDecimal getTotalQuantity(final Long assetId, LocalDate atualDate) {
@@ -81,11 +82,6 @@ public class AssetFacade {
 	
 	public List<AssetMovement> getMovements(Long assetId, String dataInicio, String dataFim) {
 		return service.getMovements(assetId, dataInicio, dataFim);
-	}
-	
-	private Long getAccountIdOfCurrentUser() {
-		final User user = securityUtils.getCurrentUser();
-		return user.getAccountId();
 	}
 
 }

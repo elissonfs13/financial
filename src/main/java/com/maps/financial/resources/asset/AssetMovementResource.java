@@ -14,12 +14,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.maps.financial.domain.asset.Asset;
 import com.maps.financial.domain.asset.AssetFacade;
 import com.maps.financial.domain.asset.AssetMovement;
+import com.maps.financial.domain.asset.MovementType;
+import com.maps.financial.resources.asset.dto.AssetDTO;
 import com.maps.financial.resources.asset.dto.AssetMovementDTO;
 
 @RestController
 @RequestMapping("/movimentacao")
 public class AssetMovementResource {
-	//TODO: Ajustar API na fase 3
+	
 	@Autowired
 	private AssetFacade assetFacade;
 	
@@ -29,31 +31,35 @@ public class AssetMovementResource {
 	/**
 	 * Endpoint REST para movimentação de compra
 	 * 
-	 * @param assetDTO
-	 * @return AssetDTO
+	 * @param assetMovementDTO
+	 * @return AssetMovementDTO
 	 */
 	@PostMapping("/compra")
-	public ResponseEntity<AssetMovementDTO> movementBuy(@RequestBody final AssetMovementDTO assetMovementDTO) {
-		final Asset movement = assetFacade.includeMovement(1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
-		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(movement.getId()).toUri();
+	public ResponseEntity<AssetDTO> movementBuy(@RequestBody final AssetMovementDTO assetMovementDTO) {
+		AssetMovement newAssetMovement = modelMapper.map(assetMovementDTO, AssetMovement.class);
+		newAssetMovement.setType(MovementType.BUY);
+		final Asset asset = assetFacade.includeMovement(assetMovementDTO.getAtivo(), newAssetMovement);
+		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(asset.getId()).toUri();
 		return ResponseEntity
 				.created(uri)
-				.body(modelMapper.map(movement, AssetMovementDTO.class));
+				.body(modelMapper.map(asset, AssetDTO.class));
 	}
 	
 	/**
 	 * Endpoint REST para movimentação de venda
 	 * 
-	 * @param assetDTO
-	 * @return AssetDTO
+	 * @param assetMovementDTO
+	 * @return AssetMovementDTO
 	 */
 	@PostMapping("/venda")
-	public ResponseEntity<AssetMovementDTO> movementSell(@RequestBody final AssetMovementDTO assetMovementDTO) {
-		final Asset movement = assetFacade.includeMovement(1L, modelMapper.map(assetMovementDTO, AssetMovement.class));
-		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(movement.getId()).toUri();
+	public ResponseEntity<AssetDTO> movementSell(@RequestBody final AssetMovementDTO assetMovementDTO) {
+		AssetMovement newAssetMovement = modelMapper.map(assetMovementDTO, AssetMovement.class);
+		newAssetMovement.setType(MovementType.SELL);
+		final Asset asset = assetFacade.includeMovement(assetMovementDTO.getAtivo(), newAssetMovement);
+		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(asset.getId()).toUri();
 		return ResponseEntity
 				.created(uri)
-				.body(modelMapper.map(movement, AssetMovementDTO.class));
+				.body(modelMapper.map(asset, AssetDTO.class));
 	}
 
 }

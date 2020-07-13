@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.maps.financial.exceptions.AuthorizationException;
 import com.maps.financial.exceptions.ExceptionMessage;
@@ -29,6 +28,11 @@ public class AssetService {
 	
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
+	/**
+	 * O ambiente disponibilizado deve conter os seguintes dados pré-cadastrados:
+	 *	- Ativos com nomes de "ATIVO0" até "ATIVO127"
+	 *	- Valores de mercado para todos os ativos acima para o dia 2020-01-02
+	 */
 	@PostConstruct
     public void init() {
 		for (Integer i = 0; i < 128; i++) {
@@ -46,7 +50,7 @@ public class AssetService {
 	
 	public Asset create(final Asset asset) {
 		//Validação: ativo só pode ser incluído por usuário com privilégio administrativo
-		if (isUserUnauthorized(Boolean.TRUE)) {
+		if (!isUserAdministrator()) {
 			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
 		}
 		
@@ -61,7 +65,7 @@ public class AssetService {
 	
 	public Asset update(final Long assetId, final Asset assetUpdate) {
 		//Validação: ativo só pode ser alterado por usuário com privilégio administrativo
-		if (isUserUnauthorized(Boolean.TRUE)) {
+		if (!isUserAdministrator()) {
 			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
 		}
 		
@@ -73,7 +77,7 @@ public class AssetService {
 	
 	public void delete(final Long assetId) {
 		//Validação: ativo só pode ser excluído por usuário com privilégio administrativo
-		if (isUserUnauthorized(Boolean.TRUE)) {
+		if (!isUserAdministrator()) {
 			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
 		}
 				
@@ -81,15 +85,15 @@ public class AssetService {
 		repository.delete(asset);
 	}
 	
-	public Asset includeMovement(final Long assetId, final AssetMovement newMovement) {
-		//Validação: usuário administrativo não deve poder gerar lançamentos e movimentos
-		if (isUserUnauthorized(Boolean.FALSE)) {
-			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
-		}
-		
+	public Asset includeMovementByAssetId(final Long assetId, final AssetMovement newMovement) {
 		Asset asset = findById(assetId);
-		newMovement.setAsset(asset);
-		asset.includeMovement(newMovement);
+		includeMovement(asset, newMovement);
+		return asset;
+	}
+	
+	public Asset includeMovementByAssetName(final String assetName, final AssetMovement newMovement) {
+		Asset asset = findByName(assetName);
+		includeMovement(asset, newMovement);
 		return asset;
 	}
 	
@@ -120,6 +124,7 @@ public class AssetService {
 	}
 	
 	public Asset excludeMarketPrice(final Long assetId, final String data) {
+		findAll();
 		LocalDate date = LocalDate.parse(data, formatter);
 		Asset asset = findById(assetId);
 		asset.excludeMarketPrice(date);
@@ -138,20 +143,34 @@ public class AssetService {
 		return movements;
 	}
 	
+	private void includeMovement(final Asset asset, final AssetMovement newMovement) {
+		//Validação: usuário administrativo não deve poder gerar lançamentos e movimentos
+		if (isUserAdministrator()) {
+			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
+		}
+		
+		newMovement.setAsset(asset);
+		asset.includeMovement(newMovement);
+	}
+	
+	private Asset findByName(String name) {
+		return repository.findByName(name);
+	}
+	
 	/**
-	 * Método responsável por verificar se o usuário logado está autorizado ou não a realizar uma ação
+	 * Método responsável por verificar se o usuário logado possui função de administrador
 	 * 
 	 * @param proceedByAdmin
 	 * @return boolean
 	 */
-	private boolean isUserUnauthorized(Boolean proceedByAdmin) {
-		return proceedByAdmin ? !securityUtils.currentUserIsAdmin() : securityUtils.currentUserIsAdmin();
+	private boolean isUserAdministrator() {
+		return securityUtils.currentUserIsAdmin();
 	}
-	
-	@Transactional
+
 	private void preRegistration(String name) {
-		Asset asset = repository.save(createAsset(name));
+		Asset asset = createAsset(name);
 		asset.includeMarketPrice(new BigDecimal(10.00), LocalDate.of(2020, 1, 2));
+		repository.save(asset);
 	}
 	
 	private Asset createAsset(String name) {
