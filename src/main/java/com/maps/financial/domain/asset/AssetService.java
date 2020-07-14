@@ -95,7 +95,7 @@ public class AssetService {
 	 * @param assetUpdate
 	 * @return Asset
 	 */
-	public Asset update(final Long assetId, final Asset assetUpdate) {
+	public synchronized Asset update(final Long assetId, final Asset assetUpdate) {
 		//Validação: ativo só pode ser alterado por usuário com privilégio administrativo
 		if (!isUserAdministrator()) {
 			throw new AuthorizationException(ExceptionMessage.MESSAGE_ACCESS_DENIED);
@@ -153,12 +153,12 @@ public class AssetService {
 	 * Quantidade total: soma das quantidades compradas menos as quantidades vendidas do ativo
 	 * 
 	 * @param assetId
-	 * @param atualDate
+	 * @param date
 	 * @return BigDecimal
 	 */
-	public BigDecimal getTotalQuantity(final Long assetId, LocalDate atualDate) {
+	public BigDecimal getTotalQuantity(final Long assetId, LocalDate date) {
 		Asset asset = findById(assetId);
-		return asset.getTotalQuantity(atualDate);
+		return asset.getTotalQuantity(date);
 	}
 	
 	/**
@@ -166,12 +166,12 @@ public class AssetService {
 	 * Valor de mercado total: quantidade total multiplicada pelo preço de mercado do ativo
 	 * 
 	 * @param assetId
-	 * @param atualDate
+	 * @param date
 	 * @return BigDecimal
 	 */
-	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate atualDate) {
+	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate date) {
 		Asset asset = findById(assetId);
-		return asset.getTotalMarketPrice(atualDate);
+		return asset.getTotalMarketPrice(date);
 	}
 	
 	/**
@@ -179,12 +179,12 @@ public class AssetService {
 	 * Rendimento: preço de mercado dividido pelo preço médio das compras
 	 * 
 	 * @param assetId
-	 * @param atualDate
+	 * @param date
 	 * @return BigDecimal
 	 */
-	public BigDecimal getIncome(final Long assetId, LocalDate atualDate) {
+	public BigDecimal getIncome(final Long assetId, LocalDate date) {
 		Asset asset = findById(assetId);
-		return asset.getIncome(atualDate);
+		return asset.getIncome(date);
 	}
 	
 	/**
@@ -192,12 +192,12 @@ public class AssetService {
 	 * Lucro: soma dos valores das vendas menos os valores das compras do ativo
 	 * 
 	 * @param assetId
-	 * @param atualDate
+	 * @param date
 	 * @return BigDecimal
 	 */
-	public BigDecimal getProfit(final Long assetId, LocalDate atualDate) {
+	public BigDecimal getProfit(final Long assetId, LocalDate date) {
 		Asset asset = findById(assetId);
-		return asset.getProfit(atualDate);
+		return asset.getProfit(date);
 	}
 	
 	/**

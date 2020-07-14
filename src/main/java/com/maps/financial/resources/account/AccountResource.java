@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.maps.financial.domain.account.Account;
 import com.maps.financial.domain.account.AccountFacade;
 import com.maps.financial.domain.account.Launch;
+import com.maps.financial.domain.account.LaunchType;
 import com.maps.financial.resources.account.dto.AccountDTO;
 import com.maps.financial.resources.account.dto.BalanceDTO;
 import com.maps.financial.resources.account.dto.LaunchDTO;
@@ -48,7 +49,9 @@ public class AccountResource {
 	 */
 	@PostMapping("/credito")
 	public ResponseEntity<AccountDTO> includeLaunchInbound(@RequestBody final LaunchDTO launchDTO) {
-		final Account account = accountFacade.includeLaunch(modelMapper.map(launchDTO, Launch.class));
+		Launch launch = modelMapper.map(launchDTO, Launch.class);
+		launch.setType(LaunchType.INBOUND);
+		final Account account = accountFacade.includeLaunch(launch);
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(account.getId()).toUri();
 		return ResponseEntity
 				.created(uri)
@@ -63,7 +66,9 @@ public class AccountResource {
 	 */
 	@PostMapping("/debito")
 	public ResponseEntity<AccountDTO> includeLaunchOutbound(@RequestBody final LaunchDTO launchDTO) {
-		final Account account = accountFacade.includeLaunch(modelMapper.map(launchDTO, Launch.class));
+		Launch launch = modelMapper.map(launchDTO, Launch.class);
+		launch.setType(LaunchType.OUTBOUND);
+		final Account account = accountFacade.includeLaunch(launch);
 		final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(account.getId()).toUri();
 		return ResponseEntity
 				.created(uri)

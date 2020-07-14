@@ -77,20 +77,20 @@ public class AssetFacade {
 		return service.includeMovementByAssetName(assetName, newMovement);
 	}
 	
-	public BigDecimal getTotalQuantity(final Long assetId, LocalDate atualDate) {
-		return service.getTotalQuantity(assetId, atualDate);
+	public BigDecimal getTotalQuantity(final Long assetId, LocalDate date) {
+		return service.getTotalQuantity(assetId, date);
 	}
 	
-	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate atualDate) {
-		return service.getTotalMarketPrice(assetId, atualDate);
+	public BigDecimal getTotalMarketPrice(final Long assetId, LocalDate date) {
+		return service.getTotalMarketPrice(assetId, date);
 	}
 	
-	public BigDecimal getIncome(final Long assetId, LocalDate atualDate) {
-		return service.getIncome(assetId, atualDate);
+	public BigDecimal getIncome(final Long assetId, LocalDate date) {
+		return service.getIncome(assetId, date);
 	}
 	
-	public BigDecimal getProfit(final Long assetId, LocalDate atualDate) {
-		return service.getProfit(assetId, atualDate);
+	public BigDecimal getProfit(final Long assetId, LocalDate date) {
+		return service.getProfit(assetId, date);
 	}
 	
 	@Transactional

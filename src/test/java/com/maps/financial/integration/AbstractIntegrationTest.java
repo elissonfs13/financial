@@ -39,7 +39,7 @@ public abstract class AbstractIntegrationTest {
 	protected static final ResultMatcher CREATED = status().isCreated(); 
 	protected static final ResultMatcher OK = status().isOk(); 
 	protected static final ResultMatcher FORBIDDEN = status().isForbidden(); 
-	protected static final ResultMatcher NO_CONTENT = status().isNoContent();
+	protected static final ResultMatcher NOT_FOUND = status().isNotFound();
 	protected static final ResultMatcher NOT_ACCEPTABLE = status().isNotAcceptable();
 	protected static final ResultMatcher UNAUTHORIZED = status().isUnauthorized();
 	

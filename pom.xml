@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.maps</groupId>
 	<artifactId>financial</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1</version>
 	<name>financial</name>
 	<description>Financial Market Simulation</description>
 
@@ -70,6 +70,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/UnitSuiteTest.class</include>
+						<include>**/IntegrationSuiteTest.class</include>
+					</includes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

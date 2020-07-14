@@ -34,7 +34,7 @@ public class ApplicationControllerAdvice {
 	
 	@ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<DefaultErrorDTO> handleObjectNotFoundException(ObjectNotFoundException ex){
-		HttpStatus statusError = HttpStatus.NO_CONTENT;
+		HttpStatus statusError = HttpStatus.NOT_FOUND;
 		return ResponseEntity
 				.status(statusError)
 				.body(getError(statusError, ex.getMessage()));

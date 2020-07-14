@@ -66,7 +66,7 @@ public class AssetIntegrationTest extends AbstractIntegrationTest {
 	@Test
 	public void stage004_findByIdNoContentTest() throws Exception {
 		Long assedIdNoContent = 100000L;
-		DefaultErrorDTO error = getForObject(BASE_URL_ID, TOKEN_ADMIN, NO_CONTENT, DefaultErrorDTO.class, assedIdNoContent);
+		DefaultErrorDTO error = getForObject(BASE_URL_ID, TOKEN_ADMIN, NOT_FOUND, DefaultErrorDTO.class, assedIdNoContent);
 		assertNotNull(error);
 	}
 	

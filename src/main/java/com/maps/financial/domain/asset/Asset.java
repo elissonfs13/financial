@@ -78,20 +78,22 @@ public class Asset {
      * Método responsável por calcular e retornar a quantidade total atual do ativo
      * Quantidade total: soma das quantidades compradas menos as quantidades vendidas do ativo
      * 
+     * @param date 
      * @return BigDecimal
      */
-    public BigDecimal getTotalQuantity(LocalDate atualDate) {
-    	return this.getQuantityBuy(atualDate).subtract(this.getQuantitySell(atualDate));
+    public BigDecimal getTotalQuantity(LocalDate date) {
+    	return this.getQuantityBuy(date).subtract(this.getQuantitySell(date));
     }
     
     /**
      * Método responsável por calcular e retornar o valor de mercado total atual do ativo
      * Valor de mercado total: quantidade total multiplicada pelo preço de mercado do ativo
      * 
+     * @param date 
      * @return BigDecimal
      */
-    public BigDecimal getTotalMarketPrice(LocalDate atualDate) {
-    	BigDecimal totalMarketPrice = this.getTotalQuantity(atualDate).multiply(this.getMarketPrice());
+    public BigDecimal getTotalMarketPrice(LocalDate date) {
+    	BigDecimal totalMarketPrice = this.getTotalQuantity(date).multiply(this.getMarketPrice());
     	return totalMarketPrice.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
@@ -99,10 +101,11 @@ public class Asset {
      * Método responsável por calcular e retornar o valor do rendimento 
      * Rendimento: preço de mercado dividido pelo preço médio das compras
      * 
+     * @param date 
      * @return BigDecimal
      */
-    public BigDecimal getIncome(LocalDate atualDate) {
-    	BigDecimal averageValueBuy = this.getAverageValueBuy(atualDate);
+    public BigDecimal getIncome(LocalDate date) {
+    	BigDecimal averageValueBuy = this.getAverageValueBuy(date);
     	if (BigDecimal.ZERO.compareTo(averageValueBuy) == 0) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
@@ -114,10 +117,11 @@ public class Asset {
      * Método responsável por calcular e retornar o valor do lucro 
      * Lucro: soma dos valores das vendas menos os valores das compras do ativo
      * 
+     * @param date 
      * @return BigDecimal
      */
-    public BigDecimal getProfit(LocalDate atualDate) {
-    	BigDecimal profit = this.getTotalValueSell(atualDate).subtract(this.getTotalValueBuy(atualDate)); 
+    public BigDecimal getProfit(LocalDate date) {
+    	BigDecimal profit = this.getTotalValueSell(date).subtract(this.getTotalValueBuy(date)); 
     	return profit.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
@@ -126,7 +130,7 @@ public class Asset {
      * 
      * @param newMovement
      */
-    public void includeMovement(AssetMovement newMovement) {
+    public synchronized void includeMovement(AssetMovement newMovement) {
     	this.movementValidations(newMovement);
     	this.movements.add(newMovement);
     }
@@ -137,7 +141,7 @@ public class Asset {
      * @param price
      * @param date
      */
-    public void includeMarketPrice(BigDecimal price, LocalDate date) {
+    public synchronized void includeMarketPrice(BigDecimal price, LocalDate date) {
     	if (price != null && date != null) {
 	    	MarketPrice marketPrice = MarketPrice.builder()
 	    			.price(price.setScale(8, BigDecimal.ROUND_DOWN))
@@ -154,7 +158,7 @@ public class Asset {
      * 
      * @param date
      */
-    public void excludeMarketPrice(LocalDate date) {
+    public synchronized void excludeMarketPrice(LocalDate date) {
     	List<MarketPrice> marketPricesFind = this.marketPrices
     			.stream()
     			.filter(p -> date.isEqual(p.getDate()))
@@ -167,17 +171,18 @@ public class Asset {
     
     /**
      * Método responsável por retornar a quantidade total de compras do ativo até a data informada
-     * @param atualDate 
+     * @param date 
      * 
+     * @param date 
      * @return BigDecimal
      */
-    private BigDecimal getQuantityBuy(LocalDate atualDate) {
-    	if (atualDate == null) {
+    private BigDecimal getQuantityBuy(LocalDate date) {
+    	if (date == null) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalQuantity = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
+    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !date.isBefore(movement.getDate()))
     			.map(movement -> movement.getQuantity())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);		
     	
@@ -186,17 +191,18 @@ public class Asset {
     
     /**
      * Método responsável por retornar o valor total de compras do ativo até a data informada
-     * @param atualDate 
+     * @param date 
      * 
+     * @param date 
      * @return BigDecimal
      */
-    private BigDecimal getTotalValueBuy(LocalDate atualDate) {
-    	if (atualDate == null) {
+    private BigDecimal getTotalValueBuy(LocalDate date) {
+    	if (date == null) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
+    			.filter(movement -> MovementType.BUY.equals(movement.getType()) && !date.isBefore(movement.getDate()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -205,17 +211,18 @@ public class Asset {
     
     /**
      * Método responsável por retornar a quantidade total de vendas do ativo até a data informada
-     * @param atualDate 
+     * @param date 
      * 
+     * @param date 
      * @return BigDecimal
      */
-    private BigDecimal getQuantitySell(LocalDate atualDate) {
-    	if (atualDate == null) {
+    private BigDecimal getQuantitySell(LocalDate date) {
+    	if (date == null) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalQuantity = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
+    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !date.isBefore(movement.getDate()))
     			.map(movement -> movement.getQuantity())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);		
     	
@@ -225,15 +232,16 @@ public class Asset {
     /**
      * Método responsável por retornar o valor total de vendas do ativo até a data informada
      * 
+     * @param date 
      * @return BigDecimal
      */
-    private BigDecimal getTotalValueSell(LocalDate atualDate) {
-    	if (atualDate == null) {
+    private BigDecimal getTotalValueSell(LocalDate date) {
+    	if (date == null) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
     	BigDecimal totalValue = this.getMovements()
     			.stream()
-    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !atualDate.isBefore(movement.getDate()))
+    			.filter(movement -> MovementType.SELL.equals(movement.getType()) && !date.isBefore(movement.getDate()))
     			.map(movement -> movement.getValue())
     			.reduce(BigDecimal.ZERO, BigDecimal::add);
     	
@@ -243,14 +251,15 @@ public class Asset {
     /**
      * Método responsável por calcular e retornar o preço médio das compras
      * 
+     * @param date 
      * @return BigDecimal
      */
-    private BigDecimal getAverageValueBuy(LocalDate atualDate) {
-    	BigDecimal quantityBuy = this.getQuantityBuy(atualDate);
+    private BigDecimal getAverageValueBuy(LocalDate date) {
+    	BigDecimal quantityBuy = this.getQuantityBuy(date);
     	if (BigDecimal.ZERO.compareTo(quantityBuy) == 0) {
     		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_DOWN);
     	}
-		BigDecimal averageValueBuy = this.getTotalValueBuy(atualDate).divide(quantityBuy, BigDecimal.ROUND_DOWN);
+		BigDecimal averageValueBuy = this.getTotalValueBuy(date).divide(quantityBuy, BigDecimal.ROUND_DOWN);
     	return averageValueBuy.setScale(2, BigDecimal.ROUND_DOWN);
     }
     
